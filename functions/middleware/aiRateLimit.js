@@ -8,6 +8,7 @@ const createAIRateLimit = function (options = {}) {
     maxRequestsPerDay = 50,
     maxRequestsPerHour = 10,
     maxMessageLength = 500,
+    maxGlobalRequestsPerDay = 1000, // Global limit across all users
     windowDayMs = 24 * 60 * 60 * 1000,
     windowHourMs = 60 * 60 * 1000,
   } = options;
@@ -39,14 +40,25 @@ const createAIRateLimit = function (options = {}) {
 
       // Use transaction for atomic rate limit checks
       await db.runTransaction(async (transaction) => {
-        // Daily rate limit
+        // Global rate limit check (across all users)
+        const globalRef = db
+          .collection("aiRateLimits")
+          .doc(`global_daily_${today}`);
+        const globalDoc = await transaction.get(globalRef);
+        const globalCount = globalDoc.exists ? globalDoc.data().count : 0;
+
+        if (globalCount >= maxGlobalRequestsPerDay) {
+          throw new Error("GLOBAL_LIMIT_EXCEEDED");
+        }
+
+        // Daily rate limit (per user)
         const dailyRef = db
           .collection("aiRateLimits")
           .doc(`daily_${userId}_${today}`);
         const dailyDoc = await transaction.get(dailyRef);
         const dailyCount = dailyDoc.exists ? dailyDoc.data().count : 0;
 
-        // Hourly rate limit
+        // Hourly rate limit (per user)
         const hourlyRef = db
           .collection("aiRateLimits")
           .doc(`hourly_${userId}_${today}_${currentHour}`);
@@ -61,7 +73,13 @@ const createAIRateLimit = function (options = {}) {
           throw new Error("HOURLY_LIMIT_EXCEEDED");
         }
 
-        // Update counters
+        // Update all counters
+        transaction.set(globalRef, {
+          count: globalCount + 1,
+          lastRequest: now,
+          expiresAt: new Date(now.getTime() + windowDayMs),
+        });
+
         transaction.set(dailyRef, {
           count: dailyCount + 1,
           lastRequest: now,
@@ -77,6 +95,14 @@ const createAIRateLimit = function (options = {}) {
 
       next();
     } catch (error) {
+      if (error.message === "GLOBAL_LIMIT_EXCEEDED") {
+        return res.status(429).json({
+          success: false,
+          botMessage:
+            "Server daily limit reached (1000/day). Try again tomorrow! The gains train is packed today 🚂💪",
+        });
+      }
+
       if (error.message === "DAILY_LIMIT_EXCEEDED") {
         return res.status(429).json({
           success: false,

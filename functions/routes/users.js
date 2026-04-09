@@ -9,6 +9,7 @@ const aiRateLimit = createAIRateLimit({
   maxRequestsPerDay: 50,
   maxRequestsPerHour: 10,
   maxMessageLength: 500,
+  maxGlobalRequestsPerDay: 1000, // Server-wide limit
 });
 
 router.post("/user/get-exercises", userLogsController.getUniqueExercises); // get their own unique exercises

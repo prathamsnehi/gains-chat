@@ -43,7 +43,7 @@ async function interpretUserLog(userMessage, oldChatHistory) {
   const allExercises = await ExercisesModel.find();
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: genAIPrompt(
       JSON.stringify(allExercises),
       userMessage,
@@ -117,7 +117,7 @@ exports.postUserLog = async (req, res, next) => {
       interpretedArray = await Promise.race([
         interpretUserLog(logMessage, oldChatHistory),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("AI_TIMEOUT")), 30000)
+          setTimeout(() => reject(new Error("AI_TIMEOUT")), 10000)
         ),
       ]);
     } catch (aiError) {
