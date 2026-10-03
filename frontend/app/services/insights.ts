@@ -47,6 +47,73 @@ export function personalRecords(lifts: Lift[]) {
   return result;
 }
 
+/** Keep history answers grounded in the named exercise, including its best sets. */
+export function historyLiftsForQuestion(
+  question: string,
+  lifts: Lift[],
+  exercises: Exercise[],
+): Lift[] {
+  const query = question.toLowerCase();
+  const words = (value: string) => value.toLowerCase().match(/[a-z]+/g) ?? [];
+  const questionWords = new Set([
+    "a", "about", "am", "at", "best", "can", "day", "did", "do", "ever",
+    "for", "have", "history", "i", "in", "is", "last", "lift", "lifts",
+    "many", "max", "me", "most", "much", "my", "on", "one", "pr", "recent",
+    "rep", "reps", "set", "sets", "show", "the", "this", "today", "was",
+    "week", "weight", "what", "when", "yesterday",
+  ]);
+  const queryWords = words(query).filter(
+    (word) => !questionWords.has(word),
+  );
+  const names = (exercise: Exercise) => [exercise.name, ...(exercise.aliases ?? [])];
+  const phraseMatches = exercises
+    .map((exercise) => ({
+      exercise,
+      length: Math.max(
+        0,
+        ...names(exercise)
+          .filter((name) => {
+            const phrase = words(name).join(" ");
+            return phrase && new RegExp(`(?:^|[^a-z])${phrase.replace(/ /g, "\\s+")}(?:$|[^a-z])`).test(query);
+          })
+          .map((name) => words(name).length),
+      ),
+    }))
+    .filter(({ length }) => length > 0);
+  const longest = Math.max(0, ...phraseMatches.map(({ length }) => length));
+  let selected = phraseMatches
+    .filter(({ length }) => length === longest)
+    .map(({ exercise }) => exercise);
+  selected = selected.filter((exercise) => {
+    const exerciseWords = new Set(names(exercise).flatMap(words));
+    return queryWords.every((word) => exerciseWords.has(word));
+  });
+  if (!selected.length && queryWords.length) {
+    selected = exercises.filter((exercise) =>
+      names(exercise).some((name) => {
+        const nameWords = new Set(words(name));
+        return queryWords.every((word) => nameWords.has(word));
+      }),
+    );
+  }
+  if (!selected.length) {
+    // An unknown exercise name must not silently resolve to a different lift.
+    const knownWords = new Set(exercises.flatMap((exercise) => names(exercise).flatMap(words)));
+    if (queryWords.some((word) => knownWords.has(word))) return [];
+    return [...lifts].sort((a, b) => b.performedAt.localeCompare(a.performedAt)).slice(0, 8);
+  }
+  const records = personalRecords(lifts);
+  const found = selected.flatMap((exercise) => {
+    const recent = lifts
+      .filter((lift) => lift.exerciseId === exercise.id)
+      .sort((a, b) => b.performedAt.localeCompare(a.performedAt))
+      .slice(0, 2);
+    const best = records.get(exercise.id);
+    return [...recent, ...(best ? [best.maxWeight, best.maxReps, best.maxEstimated] : [])];
+  });
+  return [...new Map(found.map((lift) => [lift.id, lift])).values()].slice(0, 20);
+}
+
 export function likelyToday(
   lifts: Lift[],
   exercises: Exercise[],

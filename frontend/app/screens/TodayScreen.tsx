@@ -267,7 +267,10 @@ export default function TodayScreen() {
             </Text>
             {message.status === "pending" && (
               <Text style={{ color: c.muted, fontSize: 11, marginTop: 6 }}>
-                Pending · tap retry below
+                {pending.find((item) => item.id === message.id)?.lastError ??
+                  (pending.find((item) => item.id === message.id)?.status === "processing"
+                    ? "Processing…"
+                    : "Pending · tap retry below")}
               </Text>
             )}
             {message.options?.length ? (

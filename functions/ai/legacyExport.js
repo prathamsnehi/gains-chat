@@ -27,8 +27,9 @@ async function exportLegacyCore(data) {
     UserLogsModel.countDocuments({ userId }),
   ]);
   const page = logs.slice(0, PAGE_SIZE);
-  const exerciseIds = [...new Set(page.map((log) => String(log.exercise?.exerciseId || "")).filter((id) => mongoose.isValidObjectId(id)))];
-  const exercises = await ExercisesModel.find({ _id: { $in: exerciseIds } }).lean();
+  // Exercises were a shared catalog in the old app, with no owner field. Export
+  // it once so unlogged custom exercises retain their original identity too.
+  const exercises = cursor ? [] : await ExercisesModel.find({}).lean();
   return {
     name: user.name,
     legacyUserId: String(user._id),

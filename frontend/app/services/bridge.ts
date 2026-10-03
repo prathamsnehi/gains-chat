@@ -2,6 +2,7 @@ import { AppState } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { localStore } from "@/data/localStore";
 import { ensureAnonymousAuth, processMessage } from "@/data/aiClient";
+import { historyLiftsForQuestion } from "./insights";
 
 export type Lift = {
   id: string;
@@ -45,6 +46,8 @@ export type PendingMessage = {
   createdAt: string;
   status: "pending" | "processing";
   selectedExerciseId?: string;
+  attemptCount?: number;
+  lastError?: string;
 };
 export type Snapshot = {
   lifts: Lift[];
@@ -213,6 +216,15 @@ function normalize(raw: any): Snapshot {
   };
 }
 
+function pendingError(error: unknown): string {
+  const code = String((error as { code?: unknown })?.code ?? "");
+  if (code.includes("resource-exhausted")) return "Message limit reached. Try again later.";
+  if (code.includes("unauthenticated")) return "Sign-in failed. Tap retry.";
+  if (code.includes("permission-denied")) return "App verification failed. Tap retry after setup is checked.";
+  if (code.includes("invalid-argument")) return "This message needs a correction before it can be sent.";
+  return "Couldn't process this message. Tap retry.";
+}
+
 export const bridge = {
   getSnapshot: () => snapshot,
   subscribe(listener: () => void) {
@@ -358,8 +370,9 @@ export const bridge = {
   async processPending() {
     if (draining) return;
     draining = true;
+    let queue: PendingMessage[] = [];
     try {
-      const queue = (
+      queue = (
         (await localStore.listPendingMessages()) as PendingMessage[]
       ).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
       if (!queue.length) return;
@@ -397,6 +410,7 @@ export const bridge = {
           await localStore.updatePendingMessage({
             ...item,
             status: "processing",
+            lastError: undefined,
           });
           const firstCallStarted = Date.now();
           let response = (await processMessage({
@@ -410,26 +424,10 @@ export const bridge = {
           if (response.requestId !== item.requestId)
             throw new Error("Response request ID did not match.");
           if (response.kind === "history_request") {
-            const question = item.text.toLowerCase();
-            const matching = candidates
-              .filter((candidate) =>
-                [candidate.name, ...(candidate.aliases ?? [])].some(
-                  (name) => name.length > 2 && question.includes(name.toLowerCase()),
-                ),
-              )
-              .slice(0, 4);
-            const relevant = matching.flatMap((candidate) =>
-              current.lifts
-                .filter((lift) => lift.exerciseId === candidate.id)
-                .sort((a, b) => b.performedAt.localeCompare(a.performedAt))
-                .slice(0, 2),
-            );
-            const historySnippets = (
-              relevant.length
-                ? relevant
-                : [...current.lifts]
-                    .sort((a, b) => b.performedAt.localeCompare(a.performedAt))
-                    .slice(0, 8)
+            const historySnippets = historyLiftsForQuestion(
+              item.text,
+              current.lifts,
+              current.exercises,
             ).map((l) => ({
               exerciseName: l.exerciseName,
               weight: l.weight,
@@ -516,13 +514,27 @@ export const bridge = {
             kind: response.kind,
           });
         } catch (error) {
-          await localStore.updatePendingMessage({ ...item, status: "pending" });
+          await localStore.updatePendingMessage({
+            ...item,
+            status: "pending",
+            attemptCount: (item.attemptCount ?? 0) + 1,
+            lastError: pendingError(error),
+          });
           await this.refresh();
           break; // Keep the durable queue in order; retry when online or foregrounded.
         }
       }
-    } catch {
-      // Auth, networking, and transient native errors leave messages queued for retry.
+    } catch (error) {
+      // Auth and native initialization can fail before an individual request starts.
+      if (queue[0]) {
+        await localStore.updatePendingMessage({
+          ...queue[0],
+          status: "pending",
+          attemptCount: (queue[0].attemptCount ?? 0) + 1,
+          lastError: pendingError(error),
+        }).catch(() => {});
+        await this.refresh().catch(() => {});
+      }
     } finally {
       draining = false;
     }
