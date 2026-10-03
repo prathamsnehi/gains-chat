@@ -4,6 +4,6 @@ The native module has two Core Data configurations. `Cloud` holds lifts, exercis
 
 Each lift has a stable ID, exercise identity and name, numeric weight and reps, unit, performed timestamp, and optional request and legacy IDs. Bare weights are pounds; explicit kilograms remain kilograms. Multiple sets for one exercise are separate records. The latest entry is the displayed last set. PRs use historical maximum weight, reps, and estimated one rep max (`weight × (1 + reps / 30)`).
 
-Built-in exercises live in `frontend/data/catalog.ts`; custom exercises and corrected aliases are mirrored. Similar variations have distinct identities. Today's suggestions use recent weekday and exercise patterns. Chat confirmations and the queue remain local only.
+Built-in exercises live in `frontend/data/catalog.ts`; custom exercises and corrected aliases are mirrored. Similar variations have distinct identities. Today's suggestions use recent weekday and exercise patterns. The conversation feed and queue remain on the phone. Firestore temporarily caches callable responses for retry deduplication, including lift drafts and chat replies, with a 48-hour expiration; it does not hold the durable workout history. TTL deletion is asynchronous. Rate-limit counters also expire.
 
 The native module needs an iOS development build; Expo Go does not include it. The Apple account must have the private CloudKit container capability and a production CloudKit schema before release. Verify restore on another signed-in device or after reinstall.

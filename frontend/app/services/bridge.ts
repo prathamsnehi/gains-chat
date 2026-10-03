@@ -236,6 +236,8 @@ export const bridge = {
   async initialize() {
     if (!initialized) {
       await localStore.initialize();
+      const previousDeviceData = await localStore.migratePreviousDeviceStorage();
+      if (previousDeviceData.warnings.length) console.warn("Gains Chat previous device import", previousDeviceData.warnings);
       initialized = true;
     }
     await this.refresh();

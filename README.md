@@ -12,4 +12,4 @@ Start with [development setup](docs/development.md) and [architecture](docs/arch
 
 ## Verification
 
-TypeScript, an iOS Metro export, restore and migration mapping tests, backend tests, and a [remote iOS simulator build](https://expo.dev/accounts/blackmaskexe/projects/gains-chat/builds/66daff6b-88f0-4f8f-a09e-60cff769921f) pass. The latest native configuration needs a fresh signed build. App Check, CloudKit sync, live Jev/Gemini timings, and workout restoration still require device verification. The warm two-second median is a target, not a measured result.
+TypeScript, an iOS Metro export, restore and migration mapping tests, backend tests, and a [remote iOS simulator build](https://expo.dev/accounts/blackmaskexe/projects/gains-chat/builds/3e45094e-8fd1-43f2-a1b0-a9a33a6f4855) pass. The latest native configuration compiled in the simulator build; it still needs a signed device build. App Check, CloudKit sync, live Jev/Gemini timings, and workout restoration still require device verification. The warm two-second median is a target, not a measured result.

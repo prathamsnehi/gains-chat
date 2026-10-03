@@ -7,10 +7,11 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test": "node --test ai/*.test.js"
+    "test": "node --test ai/*.test.js",
+    "check:firestore": "node scripts/validateFirestoreConfig.js"
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {

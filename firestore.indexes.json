@@ -1,0 +1,8 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "messageRequests", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "messageLimits", "fieldPath": "expiresAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "legacyExportLimits", "fieldPath": "expiresAt", "ttl": true, "indexes": [] }
+  ]
+}
