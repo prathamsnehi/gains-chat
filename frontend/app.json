@@ -3,7 +3,9 @@
     "name": "Gains Chat",
     "slug": "gains-chat",
     "version": "1.4.0",
-    "platforms": ["ios"],
+    "platforms": [
+      "ios"
+    ],
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -14,15 +16,22 @@
       "bundleIdentifier": "com.blackmaskexe.gainschat",
       "googleServicesFile": "./GoogleService-Info.plist",
       "entitlements": {
-        "com.apple.developer.icloud-services": ["CloudKit"],
-        "com.apple.developer.icloud-container-identifiers": ["iCloud.com.blackmaskexe.gainschat"],
+        "com.apple.developer.icloud-services": [
+          "CloudKit"
+        ],
+        "com.apple.developer.icloud-container-identifiers": [
+          "iCloud.com.blackmaskexe.gainschat"
+        ],
         "com.apple.developer.devicecheck.appattest-environment": "production",
         "aps-environment": "development"
       },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UIBackgroundModes": ["remote-notification"]
-      }
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      },
+      "appleTeamId": "T296YJXC87"
     },
     "plugins": [
       "expo-router",
