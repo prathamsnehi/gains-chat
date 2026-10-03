@@ -8,8 +8,6 @@ exports.postAddUser = async (req, res, next) => {
   try {
     await connectDb();
 
-    console.log("not my boss, ", req.body);
-
     const foundUser = await UsersModel.findOne({
       email: req.body.email.toLowerCase(),
     });

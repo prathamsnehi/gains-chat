@@ -1,3 +1,0 @@
-- add ability to delete account in the settings
-- optimize custom components (no change in app, only code readability)
-- remove unnecessary dependencies

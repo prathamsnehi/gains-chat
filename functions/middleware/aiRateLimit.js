@@ -120,7 +120,10 @@ const createAIRateLimit = function (options = {}) {
       }
 
       console.error("AI Rate limiting error:", error);
-      next(); // Continue on error to avoid breaking the app
+      return res.status(503).json({
+        success: false,
+        botMessage: "Message service is temporarily unavailable. Please retry.",
+      });
     }
   };
 };

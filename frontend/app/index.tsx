@@ -1,40 +1,56 @@
-import * as SecureStore from "expo-secure-store";
-import { useState, useEffect } from "react";
-import { View, ActivityIndicator, StatusBar } from "react-native";
-
+import React from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StatusBar,
+  Text,
+  View,
+} from "react-native";
 import BottomTabsNavigation from "./navigation/BottomTabsNavigation";
-import LoginStack from "./navigation/stack navigators/LoginStack";
-import LoginPageOnboarding from "./components/LoginPageOnboarding";
+import { useInitializeGains } from "./services/useGains";
+import { usePalette } from "./theme/palette";
 
 export default function Index() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  useEffect(() => {
-    SecureStore.getItemAsync("isAuthenticated")
-      .then((isAuthenticated) => {
-        setIsAuthenticated(isAuthenticated === "true");
-      })
-      .catch((err) => console.log(err));
-  }, []);
-  if (isAuthenticated == null) {
-    // use as a loading screen when the isAuthenticated key is being fetched from secure storage
-    return (
-      <>
-        {/* makes it so that the statusbar items are black because app bg is white */}
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-
+  const c = usePalette();
+  const state = useInitializeGains();
+  return (
+    <View style={{ flex: 1, backgroundColor: c.background }}>
+      <StatusBar
+        barStyle={c.background === "#101311" ? "light-content" : "dark-content"}
+        backgroundColor={c.background}
+      />
+      {state.ready ? (
+        <BottomTabsNavigation />
+      ) : state.error ? (
+        <View style={{ flex: 1, justifyContent: "center", padding: 30 }}>
+          <Text style={{ color: c.text, fontSize: 25, fontWeight: "700" }}>
+            Couldn’t open your training data
+          </Text>
+          <Text style={{ color: c.muted, marginTop: 10, lineHeight: 21 }}>
+            {state.error}
+          </Text>
+          <Pressable
+            onPress={state.retry}
+            style={{
+              backgroundColor: c.accent,
+              padding: 14,
+              borderRadius: 14,
+              marginTop: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: c.accentText, fontWeight: "700" }}>
+              Retry
+            </Text>
+          </Pressable>
+        </View>
+      ) : (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator color={c.accent} size="large" />
         </View>
-      </>
-    );
-  }
-  return isAuthenticated ? (
-    <BottomTabsNavigation />
-  ) : (
-    <>
-      <LoginStack onboarding={true} />
-    </>
+      )}
+    </View>
   );
 }
