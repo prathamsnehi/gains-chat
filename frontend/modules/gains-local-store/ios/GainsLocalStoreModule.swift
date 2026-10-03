@@ -105,6 +105,17 @@ private final class GainsStore {
     }
     group.wait()
     if let error = loadError { throw error }
+    #if DEBUG
+    // Populate all Core Data record types and fields in the development environment.
+    // Deploy that schema in CloudKit Console before a TestFlight/App Store build.
+    // Failure (including an unsigned simulator or no iCloud account) must not prevent local use.
+    do {
+      try persistent.initializeCloudKitSchema(options: [])
+    } catch {
+      let schemaError = error as NSError
+      NSLog("Gains Chat development CloudKit schema initialization failed (%@:%ld).", schemaError.domain, schemaError.code)
+    }
+    #endif
     persistent.viewContext.automaticallyMergesChangesFromParent = true
     persistent.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
     syncObserver = NotificationCenter.default.addObserver(

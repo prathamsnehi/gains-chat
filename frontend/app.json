@@ -15,10 +15,13 @@
       "googleServicesFile": "./GoogleService-Info.plist",
       "entitlements": {
         "com.apple.developer.icloud-services": ["CloudKit"],
-        "com.apple.developer.icloud-container-identifiers": ["iCloud.com.blackmaskexe.gainschat"]
+        "com.apple.developer.icloud-container-identifiers": ["iCloud.com.blackmaskexe.gainschat"],
+        "com.apple.developer.devicecheck.appattest-environment": "production",
+        "aps-environment": "development"
       },
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["remote-notification"]
       }
     },
     "plugins": [
@@ -41,7 +44,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "./plugins/withNativeServiceInitialization"
     ],
     "experiments": {
       "typedRoutes": true

@@ -5,12 +5,14 @@ import {
 } from "@react-native-firebase/auth";
 import {
   initializeAppCheck,
+  getToken,
   ReactNativeFirebaseAppCheckProvider,
 } from "@react-native-firebase/app-check";
 import {
   getFunctions,
   httpsCallable,
 } from "@react-native-firebase/functions";
+import { waitForAppCheckToken } from "./appCheckReadiness";
 
 export interface ExerciseCandidate {
   id: string;
@@ -95,13 +97,14 @@ async function initializeFirebase(): Promise<void> {
       const provider = new ReactNativeFirebaseAppCheckProvider();
       provider.configure({
         apple: {
-          provider: __DEV__ ? "debug" : "appAttestWithDeviceCheckFallback",
+          provider: __DEV__ ? "debug" : "appAttest",
         },
       });
-      await initializeAppCheck(app, {
+      const appCheck = initializeAppCheck(app, {
         provider,
         isTokenAutoRefreshEnabled: true,
       });
+      await waitForAppCheckToken(() => getToken(appCheck, false));
       const auth = getAuth(app);
       if (!auth.currentUser) {
         await signInAnonymously(auth);

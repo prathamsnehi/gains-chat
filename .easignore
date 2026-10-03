@@ -69,6 +69,7 @@ frontend/GoogleService-Info.plist
 frontend/.expo/
 frontend/ios/
 frontend/android/
+recent-workouts.private.json
 
 # dataconnect generated files
 .dataconnect

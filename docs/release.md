@@ -1,10 +1,20 @@
 # TestFlight and release gates
 
-1. Export and verify a private MongoDB backup of users, exercises, and logs. Record the counts and manifest hash.
-2. Provision CloudKit, Firebase Anonymous Auth, App Check, Firestore, and callable secrets. Verify the EAS source archive includes the local Firebase plist or supply it through a file environment variable.
+1. Preserve only the owner's workout logs from the previous month and the exercise identities needed to restore them. The owner explicitly replaced the full accounts/database backup requirement; accounts and unrelated users must not be exported. Verify the selected count, dates, exercise names, weights, and reps against Atlas before using the restore fixture.
+2. Provision CloudKit, Firebase Anonymous Auth, App Check, Firestore, and callable secrets. Register App Attest for the existing iOS Firebase app. Firestore client rules should deny direct access because all rate-limit writes use the Admin SDK. Configure `expiresAt` TTL policies for `messageRequests`, `messageLimits`, and `legacyExportLimits`. Verify the EAS source archive includes the local Firebase plist or supply it through a file environment variable.
 3. Build and install a development client. Test offline queue order, retry deduplication, correction, backdated sets, similar exercises, CloudKit upload, and recovery.
 4. Measure pending feedback, function total, Jev, Gemini, and warm and cold latency separately. Investigate a warm median above two seconds.
-5. Release through TestFlight with the existing bundle ID. Import the account on the owner's iPhone; compare count and sample timestamps, exercises, goals, and chat against the backup. Verify iCloud restore.
-6. Retire the old user and admin HTTP routes after verification, then publish the in-place App Store update. Keep the recoverable backup until the new release is established.
+5. Upload a `production` EAS build through TestFlight with the existing bundle ID. Restore the preserved month on the owner's iPhone and compare its count and sample timestamps, exercises, weights, and reps with the fixture. The owner takes over TestFlight testing after upload. Verify iCloud restore.
+6. Retire the old user and admin HTTP routes after the required data has been preserved and restore is verified. Publish the in-place App Store update only after the owner's TestFlight checks.
 
-A remote iOS simulator build compiled successfully. No TestFlight build or production deploy has been performed. Native signing, live data, and service keys are required for those gates.
+## Apple signing and CloudKit setup
+
+- On App ID `com.blackmaskexe.gainschat`, enable iCloud and select `iCloud.com.blackmaskexe.gainschat`, enable Push Notifications, and enable App Attest. Regenerate the App Store provisioning profile after capability changes. EAS synchronizes these from app entitlements when the Apple session is authorized.
+- The native initialization plugin runs after RNFirebase's dangerous mods, leaves one `FirebaseApp.configure()` call after the App Check factory, and registers for silent remote notifications. The app declares the remote notification background mode. User-facing notification permission is unnecessary for CloudKit's silent notifications.
+- Run a development build on an iCloud-signed-in device or simulator to populate the development schema. `GainsLocalStore` calls `initializeCloudKitSchema` only in `DEBUG` builds; a schema setup failure is logged without stopping local storage. In CloudKit Console, select the container, review **Deploy Schema Changes**, and deploy to production. Ensure the Core Data `CD_CloudRecord` fields and system metadata exist before TestFlight. Schema deployment copies definitions, not workout records.
+- Inspect the production archive's entitlements: the iCloud container must match; App Attest must use `production`; APNs and iCloud environments must reflect App Store distribution. App config declares APNs `development` to enable the capability; distribution signing supplies its production value.
+- Use an App Store Connect API key or the authorized EAS submit credential for the existing app record. Set `submit.production.ios.ascAppId` once the existing numeric App Store Connect app ID is known. Development/internal profiles cannot be uploaded to TestFlight.
+
+Reference: [Apple Core Data setup](https://developer.apple.com/documentation/coredata/setting-up-core-data-with-cloudkit), [CloudKit schema deployment](https://developer.apple.com/documentation/cloudkit/deploying-an-icloud-container-s-schema), [Firebase App Attest](https://firebase.google.com/docs/app-check/ios/app-attest-provider), [Expo TestFlight](https://docs.expo.dev/submit/testflight/).
+
+A remote iOS simulator build compiled successfully. A production build attempt on October 3, 2026 stopped before upload: the App Store provisioning profile expired, and Apple's API returned 403 because a required agreement is missing or expired. The account owner must resolve that agreement before signing can be renewed. No TestFlight build or production deploy has been performed.

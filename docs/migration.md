@@ -1,17 +1,33 @@
-# One-time legacy import
+# Restore recent workouts
 
-The old service stores users, exercises, and lifts in MongoDB. `functions/scripts/exportLegacyBackup.js` exports those collections to a private JSONL file with verified counts and a SHA-256 manifest. Create this backup **before** deployment or live import, outside the repository with private permissions. Supply `DB_URI` through the process environment, or use `--prompt` to enter it without terminal echo, a credential file, or shell history. Keep the backup until TestFlight import and iCloud recovery are checked.
+The owner replaced the original full MongoDB backup and password import with preservation of only recent workout records. No accounts, password hashes, or unrelated users belong in the restore file.
 
-From the repository root, this saves only the backup and its manifest directly in the existing Downloads folder (which must have mode 0700):
+Read the owner's filtered workout records from Atlas and preserve their source log IDs, exercise IDs and names, numeric weights and reps, and original timestamps. Convert the original timestamp to ISO UTC without changing its instant. Legacy weights without a unit use pounds. Confirm the date window with the owner if the latest recorded workout predates the calendar month.
 
-```sh
-node functions/scripts/exportLegacyBackup.js --prompt "$HOME/Downloads/gainschat-legacy-2026-10-03.jsonl"
+The local `recent-workouts.private.json` file is ignored by Git and EAS, has private file permissions, and is never bundled into a release. Its schema is:
+
+```json
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-10-03T00:00:00.000Z",
+  "from": "2026-08-02T00:00:00.000Z",
+  "to": "2026-09-02T23:59:59.999Z",
+  "lifts": [
+    {
+      "id": "source-log-id",
+      "exerciseId": "source-exercise-id",
+      "exerciseName": "Incline Dumbbell Press",
+      "weight": 45,
+      "reps": 10,
+      "unit": "lb",
+      "performedAt": "2026-08-25T23:46:08.000Z"
+    }
+  ]
+}
 ```
 
-Paste the existing `DB_URI` secret at the hidden prompt. The exporter refuses to overwrite a backup. Atlas cloud backups are unavailable on free clusters; the Data Explorer's “Export code” action exports a query rather than collection data.
+Once the new app is ready, transfer the file privately to the owner's iPhone Files app. In Settings, choose the workout file, review the date range and count, then restore it. Validation rejects unexpected account fields, invalid numbers or dates, conflicting identities, and records outside the declared range before any write. Core Data imports in one transaction using stable `restore:` IDs; repeating the restore skips saved lifts and preserves later edits.
 
-Settings asks for the previous account email and password once. `exportLegacyData` verifies that password against the old hash and returns pages of up to 500 logs, including exercise identities, names, weights, reps, dates, total count, and cursor. The first page includes the shared legacy exercise catalog, preserving exercises without logs too. The phone imports stable legacy IDs, and retries skip records already present. It also reads old `exerciseGoals` and `logMessages` from existing iPhone storage, checking the stored owner ID when available. Those old values remain in place during verification. Credentials are not persisted by the new flow.
+Compare the imported count, timestamps, exercise names, weights, and fractional reps with Atlas. Check private iCloud recovery before removing the restore file or retiring the old service. Existing goals and available chat can still be read from storage on the same iPhone during the in-place update.
 
-After import, the phone counts saved legacy lifts and compares that count with the export total. Check sample dates, exercise variations, goals, and available chat on the actual iPhone. Verify private iCloud recovery before retiring the old service. An interrupted page leaves earlier imports intact; retry after fixing the error.
-
-The old HTTP user and admin routes remain a security risk because user routes accept a client supplied ID. Keep them out of the new app and retire them at cutover after the backup and import have been checked. Do not remove the old service before that gate.
+The legacy password export callable and backup script remain available for compatibility, but this owner's restore flow does not use them. The old HTTP user routes trust a client-supplied identity. Retire the legacy user and admin data routes at verified cutover; the new app does not call them.
