@@ -56,11 +56,16 @@ export function historyLiftsForQuestion(
   const query = question.toLowerCase();
   const words = (value: string) => value.toLowerCase().match(/[a-z]+/g) ?? [];
   const questionWords = new Set([
-    "a", "about", "am", "at", "best", "can", "day", "did", "do", "ever",
-    "for", "have", "history", "i", "in", "is", "last", "lift", "lifts",
-    "many", "max", "me", "most", "much", "my", "on", "one", "pr", "recent",
-    "rep", "reps", "set", "sets", "show", "the", "this", "today", "was",
-    "week", "weight", "what", "when", "yesterday",
+    "a", "about", "ago", "am", "at", "before", "best", "can", "compare",
+    "compared", "day", "did", "do", "done", "ever", "first", "for", "had",
+    "have", "heaviest", "heavy", "history", "how", "i", "in", "is", "kg",
+    "kgs", "kilos", "kilograms", "last", "lb", "lbs", "lift", "lifts",
+    "log", "logged", "many", "max", "me", "month", "months", "most", "much",
+    "my", "on", "one", "performed", "personal", "pounds", "pr", "previous",
+    "progress", "recent", "record", "records", "rep", "reps", "set", "sets",
+    "show", "since", "strongest", "strength", "the", "this", "time", "times",
+    "today", "trend", "trends", "use", "used", "was", "week", "weight",
+    "were", "what", "when", "year", "years", "yesterday",
   ]);
   const queryWords = words(query).filter(
     (word) => !questionWords.has(word),

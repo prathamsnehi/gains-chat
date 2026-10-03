@@ -21,6 +21,10 @@ test("history lookup keeps similarly named exercises separate and includes older
     ["flat-new", "flat-old"],
   );
   assert.deepEqual(
+    historyLiftsForQuestion("how much did I bench last time?", lifts, exercises).map((lift) => lift.id),
+    ["flat-new", "flat-old"],
+  );
+  assert.deepEqual(
     historyLiftsForQuestion("incline db bp PR?", lifts, exercises).map((lift) => lift.id),
     ["incline"],
   );

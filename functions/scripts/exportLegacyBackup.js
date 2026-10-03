@@ -4,20 +4,43 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const readline = require("node:readline");
+const { Writable } = require("node:stream");
 const { MongoClient } = require("mongodb");
 
+async function promptForUri() {
+  if (!process.stdin.isTTY) throw new Error("Run --prompt in an interactive terminal.");
+  // Suppress readline's echo and history; the credential never becomes a file
+  // or shell argument. Only the resulting backup is persisted.
+  const output = new Writable({ write(_chunk, _encoding, callback) { callback(); } });
+  const reader = readline.createInterface({ input: process.stdin, output, terminal: true, historySize: 0 });
+  process.stderr.write("Paste MongoDB URI (hidden), then press Return: ");
+  try {
+    return await new Promise((resolve, reject) => {
+      reader.once("SIGINT", () => reject(new Error("Backup cancelled.")));
+      reader.once("close", () => reject(new Error("Backup cancelled.")));
+      reader.question("", (value) => resolve(value.trim()));
+    });
+  } finally {
+    reader.close();
+    process.stderr.write("\n");
+  }
+}
+
 async function main() {
-  const outputPath = process.argv[2];
-  const dbUri = process.env.DB_URI;
+  const args = process.argv.slice(2);
+  const outputPath = args.find((value) => value !== "--prompt");
   const repoRoot = path.resolve(__dirname, "../..");
-  if (!dbUri || !outputPath || !path.isAbsolute(outputPath)) throw new Error("Set DB_URI and pass an absolute output path.");
+  if (!outputPath || !path.isAbsolute(outputPath)) throw new Error("Pass an absolute output path.");
   const resolved = path.resolve(outputPath);
   if (resolved === repoRoot || resolved.startsWith(repoRoot + path.sep)) throw new Error("Backup path must be outside the repository.");
   const parent = path.dirname(resolved);
   if (!fs.existsSync(parent) || fs.lstatSync(parent).isSymbolicLink()) throw new Error("Use an existing private output directory.");
   const stat = fs.statSync(parent);
-  if ((stat.mode & 0o077) !== 0) throw new Error("Output directory must deny group and other access (mode 0700).");
+  if (!stat.isDirectory() || (stat.mode & 0o077) !== 0) throw new Error("Output directory must deny group and other access (mode 0700).");
   if (fs.existsSync(resolved) || fs.existsSync(resolved + ".manifest.json")) throw new Error("Output already exists.");
+  const dbUri = args.includes("--prompt") ? await promptForUri() : process.env.DB_URI;
+  if (!dbUri) throw new Error("Set DB_URI or use --prompt.");
 
   const client = new MongoClient(dbUri);
   const temporary = resolved + ".partial-" + process.pid;
@@ -65,6 +88,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  process.stderr.write(error.message + "\n");
+  process.stderr.write(String(error.message).replace(/mongodb(?:\+srv)?:\/\/\S+/gi, "[MongoDB URI redacted]") + "\n");
   process.exitCode = 1;
 });
