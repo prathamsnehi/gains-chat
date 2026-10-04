@@ -10,7 +10,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.blackmaskexe.gainschat",
@@ -35,6 +34,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-font",
       "@react-native-firebase/app",
       "@react-native-firebase/app-check",
       [

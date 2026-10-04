@@ -6,9 +6,9 @@ import {
   Text,
   View,
 } from "react-native";
-import BottomTabsNavigation from "./navigation/BottomTabsNavigation";
-import { useInitializeGains } from "./services/useGains";
-import { usePalette } from "./theme/palette";
+import BottomTabsNavigation from "../navigation/BottomTabsNavigation";
+import { useInitializeGains } from "../services/useGains";
+import { usePalette } from "../theme/palette";
 
 export default function Index() {
   const c = usePalette();

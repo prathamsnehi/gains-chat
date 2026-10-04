@@ -7,8 +7,8 @@
     "start": "expo start --dev-client",
     "ios": "expo run:ios",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test data/migrationRecords.test.ts data/workoutRestore.test.ts data/deviceStorageMigration.test.ts data/appCheckReadiness.test.ts app/services/insights.test.ts plugins/withNativeServiceInitialization.test.js",
-    "doctor": "expo-doctor"
+    "test": "node --import tsx --test data/migrationRecords.test.ts data/workoutRestore.test.ts data/deviceStorageMigration.test.ts data/appCheckReadiness.test.ts services/insights.test.ts plugins/withNativeServiceInitialization.test.js",
+    "doctor": "npx expo-doctor"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.0",
@@ -22,10 +22,12 @@
     "@react-navigation/native": "^7.0.0",
     "expo": "~55.0.31",
     "expo-build-properties": "~55.0.0",
+    "expo-constants": "~55.0.17",
     "expo-dev-client": "~55.0.0",
     "expo-document-picker": "~55.0.17",
     "expo-file-system": "~55.0.26",
-    "expo-modules-core": "~55.0.0",
+    "expo-font": "~55.0.8",
+    "expo-linking": "~55.0.17",
     "expo-router": "~55.0.18",
     "expo-secure-store": "~55.0.0",
     "expo-splash-screen": "~55.0.0",

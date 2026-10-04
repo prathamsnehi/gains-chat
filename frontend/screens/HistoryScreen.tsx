@@ -174,7 +174,7 @@ function ExerciseManager({
 
 export default function HistoryScreen() {
   const c = usePalette();
-  const { lifts, exercises, bridge } = useGains();
+  const { lifts, exercises, messages, bridge } = useGains();
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Lift | undefined>();
   const [editorVisible, setEditorVisible] = useState(false);
@@ -388,6 +388,9 @@ export default function HistoryScreen() {
         visible={editorVisible}
         onClose={() => setEditorVisible(false)}
         lift={editing}
+        originalMessage={
+          messages.find((message) => message.id === editing?.requestId)?.text
+        }
         exercises={exercises}
       />
       <ExerciseManager

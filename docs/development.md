@@ -1,6 +1,6 @@
 # Development
 
-Requirements: Node 22, npm, Xcode and iOS signing, an Apple Developer account with `iCloud.com.blackmaskexe.gainschat`, Expo/EAS access, and Firebase project `gains-chat`. Firebase Functions run on Node 22, declared in `functions/package.json`. The native Core Data module needs a development build; Expo Go cannot run it.
+Requirements: Node 22, npm, Xcode and iOS signing, an Apple Developer account with `iCloud.com.blackmaskexe.gainschat`, Expo/EAS access, and Firebase project `gains-chat`. Local Expo native builds also require CocoaPods 1.15.2 or later; EAS supplies its own native tooling. Firebase Functions run on Node 22, declared in `functions/package.json`. The native Core Data module needs a development build; Expo Go cannot run it.
 
 1. In `frontend/`, run `npm ci` and `npm run typecheck`.
 2. Put the Firebase Apple config at `frontend/GoogleService-Info.plist` for bundle ID `com.blackmaskexe.gainschat`. This file is ignored by Git but included in the EAS source upload by the root `.easignore`. A **file** environment variable named `GOOGLE_SERVICES_PLIST` can supply an alternate path; `app.config.js` uses it when present.
@@ -9,6 +9,8 @@ Requirements: Node 22, npm, Xcode and iOS signing, an Apple Developer account wi
 5. Build a signed development client with `eas build --profile development --platform ios`, install it, then run `npm start` in `frontend/`.
 
 Run the additional release initialization checks with `node --import tsx --test data/appCheckReadiness.test.ts plugins/withNativeServiceInitialization.test.js` from `frontend/`. The native transform tests compose the installed RNFirebase Expo plugins in both orders and verify a single Firebase initialization after the App Check factory.
+
+Keep only route components in `frontend/app/`. Shared components, screens, navigation, services, and tests live outside it so Expo Router does not package them as routes. Before an EAS release build, run `npm test`, `npm run typecheck`, `npm run doctor`, and `npx expo export --platform ios --output-dir ios/verification-export` in `frontend/`. Expo Doctor needs network access; a local CocoaPods warning must be resolved before building the full Expo app locally.
 
 Debug native builds populate the CloudKit development schema when the store loads. Use an iCloud-signed-in device or simulator, then deploy the schema in CloudKit Console before TestFlight. See [release gates](release.md) for signing and production checks. A local schema initialization failure does not block recording lifts.
 

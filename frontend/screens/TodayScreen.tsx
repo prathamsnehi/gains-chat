@@ -268,17 +268,27 @@ export default function TodayScreen() {
             {message.status === "pending" && (
               <Text style={{ color: c.muted, fontSize: 11, marginTop: 6 }}>
                 {pending.find((item) => item.id === message.id)?.lastError ??
-                  (pending.find((item) => item.id === message.id)?.status === "processing"
+                  (pending.find((item) => item.id === message.id)?.status ===
+                  "processing"
                     ? "Processing…"
                     : "Pending · tap retry below")}
               </Text>
             )}
             {message.options?.length ? (
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7, marginTop: 10 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 7,
+                  marginTop: 10,
+                }}
+              >
                 {message.options.map((option) => (
                   <Pressable
                     key={option.id}
-                    onPress={() => void bridge.chooseClarification(message.id, option.id)}
+                    onPress={() =>
+                      void bridge.chooseClarification(message.id, option.id)
+                    }
                     style={{
                       backgroundColor: c.elevated,
                       borderRadius: 10,
@@ -286,7 +296,9 @@ export default function TodayScreen() {
                       paddingVertical: 7,
                     }}
                   >
-                    <Text style={{ color: c.text, fontSize: 13, fontWeight: "600" }}>
+                    <Text
+                      style={{ color: c.text, fontSize: 13, fontWeight: "600" }}
+                    >
                       {option.name}
                     </Text>
                   </Pressable>
@@ -373,6 +385,10 @@ export default function TodayScreen() {
         visible={!!editor}
         onClose={() => setEditor(null)}
         lift={editor?.lift}
+        originalMessage={
+          messages.find((message) => message.id === editor?.lift?.requestId)
+            ?.text
+        }
         exercise={exercises.find((e) => e.id === editor?.exerciseId)}
         exercises={exercises}
       />
