@@ -36,9 +36,21 @@ export default function SettingsScreen() {
       void bridge.refresh();
       localStore
         .getSyncStatus()
-        .then((status) =>
-          setSync(typeof status === "string" ? status : JSON.stringify(status)),
-        )
+        .then((status) => {
+          if (status.icloudAccount === "noAccount") {
+            setSync("Sign in to iCloud in iPhone Settings to sync your lifts.");
+          } else if (status.icloudAccount === "restricted") {
+            setSync("iCloud is restricted on this device. Your lifts stay saved here.");
+          } else if (!status.cloudEnabled) {
+            setSync("iCloud is unavailable. Your lifts stay saved here.");
+          } else if (status.phase === "failed") {
+            setSync("iCloud sync will retry. Your lifts stay saved here.");
+          } else if (status.phase === "idle") {
+            setSync("iCloud is connected.");
+          } else {
+            setSync("Syncing with iCloud…");
+          }
+        })
         .catch(() => setSync("iCloud sync status unavailable"));
     }, [bridge]),
   );

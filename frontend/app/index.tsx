@@ -1,4 +1,5 @@
 import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ActivityIndicator,
   Pressable,
@@ -14,7 +15,7 @@ export default function Index() {
   const c = usePalette();
   const state = useInitializeGains();
   return (
-    <View style={{ flex: 1, backgroundColor: c.background }}>
+    <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1, backgroundColor: c.background }}>
       <StatusBar
         barStyle={c.background === "#101311" ? "light-content" : "dark-content"}
         backgroundColor={c.background}
@@ -51,6 +52,6 @@ export default function Index() {
           <ActivityIndicator color={c.accent} size="large" />
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
