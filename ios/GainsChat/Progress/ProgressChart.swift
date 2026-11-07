@@ -13,7 +13,7 @@ struct ProgressChart: View {
             )
             .foregroundStyle(.blue)
         }
-        .chartYAxisLabel(Text(points.last?.unit.label ?? "lb"))
+        .chartYAxisLabel(points.last?.unit.label ?? "lb")
         .frame(height: AppMetrics.chartHeight)
     }
 }

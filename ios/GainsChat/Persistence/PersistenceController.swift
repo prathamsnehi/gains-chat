@@ -1,3 +1,4 @@
+import CloudKit
 import CoreData
 import Foundation
 import GainsCore
@@ -37,7 +38,7 @@ final class PersistenceController {
         }
         didOpen = result.succeeded
         container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
 
     var isOpen: Bool { didOpen }
