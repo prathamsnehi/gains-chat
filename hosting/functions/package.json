@@ -1,0 +1,14 @@
+{
+  "name": "gains-chat-hosting",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "24"
+  },
+  "scripts": {
+    "test": "node --test chatCore.test.js"
+  },
+  "dependencies": {
+    "firebase-functions": "7.4.0"
+  }
+}

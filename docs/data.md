@@ -1,11 +1,14 @@
 # Local and cloud data
 
-The native module has two Core Data configurations. `Cloud` holds lifts, exercises, aliases, and goals and mirrors to `iCloud.com.blackmaskexe.gainschat`. `Local` holds chat and the durable pending queue. Core Data works without network; CloudKit sync runs separately. Settings shows iCloud account and sync phase. A local save does not prove remote sync completed.
+Two Core Data configurations share one container.
 
-Each lift has a stable ID, exercise identity and name, numeric weight and reps, unit, performed timestamp, and an optional request ID. Bare weights are pounds; explicit kilograms remain kilograms. Multiple sets for one exercise are separate records. The latest entry is the displayed last set. PRs use historical maximum weight, reps, and estimated one rep max (`weight × (1 + reps / 30)`).
+- `Cloud` holds `Exercise` and `Lift` and syncs to `iCloud.com.blackmaskexe.gainschat`.
+- `Local` holds `ChatLine` and never syncs.
 
-Built-in exercises live in `frontend/data/catalog.ts`; custom exercises and corrected aliases are mirrored. Similar variations have distinct identities. Today's suggestions use recent weekday and exercise patterns. The conversation feed and queue remain on the phone. Firestore temporarily caches callable responses for retry deduplication, including lift drafts and chat replies, with a 48-hour expiration; it does not hold the durable workout history. TTL deletion is asynchronous. Rate-limit counters also expire.
+An exercise has a stable id, a canonical name, and aliases such as `bp`. A lift has a stable id, exercise id, display name, weight, reps, unit, and performed time. Bare weights are pounds. An explicit kilogram stays kilograms. Estimated one-rep max is `weight × (1 + reps / 30)`.
 
-The native module needs an iOS development build; Expo Go does not include it. The Apple account must have the private CloudKit container capability and a production CloudKit schema before release. Verify restore on another signed-in device or after reinstall.
+There is no preloaded exercise list. The shorthand parser expands language (`bp`, `db`, `ohp`, `rdl`) and then matches the user's own exercises. A new name creates an exercise. `bp` does not attach to a dumbbell variation. Two equally good matches ask once and do not save.
 
-Pending-message JSON can also contain an immutable `request` and `phase` (`message` or `history`). These are payload fields in the existing LocalRecord entity, so no Core Data model or CloudKit schema change is required. Older unsent items acquire these fields before their next transmission. The client does not silently replace an ID that the server rejects as already used for different input.
+On first launch the app reads an older `GainsLocalStore/Cloud.sqlite` if it is still on the phone. `LegacyImporter` keeps lift, exercise, and alias rows and ignores goals. New writes use the new entities only.
+
+A local save does not prove the CloudKit export finished. The Chat toolbar shows the iCloud account status.
