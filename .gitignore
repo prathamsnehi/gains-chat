@@ -51,8 +51,6 @@ node_modules/
 !**/.yarn/releases/
 !**/.yarn/patches/
 audit-*.jsonl
-frontend/dist/
-
 # Optional npm cache directory
 .npm
 
@@ -70,10 +68,11 @@ frontend/dist/
 
 # dotenv environment variables file
 .env
-frontend/GoogleService-Info.plist
-frontend/.expo/
-frontend/ios/
-frontend/android/
+ios/GainsChat/GoogleService-Info.plist
+ios/GainsCore/.build/
+ios/**/xcuserdata/
+DerivedData/
+*.xcuserstate
 recent-workouts.private.json
 
 # dataconnect generated files
