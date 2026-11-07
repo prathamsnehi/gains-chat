@@ -5,7 +5,7 @@ public struct LiftRecord: Equatable, Identifiable, Sendable {
     public var exerciseID: String
     public var exerciseName: String
     public var weight: Double
-    public var reps: Int
+    public var reps: Double
     public var unit: WeightUnit
     public var performedAt: Date
 
@@ -14,7 +14,7 @@ public struct LiftRecord: Equatable, Identifiable, Sendable {
         exerciseID: String,
         exerciseName: String,
         weight: Double,
-        reps: Int,
+        reps: Double,
         unit: WeightUnit,
         performedAt: Date
     ) {

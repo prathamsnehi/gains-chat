@@ -69,7 +69,7 @@ final class PersistenceController {
     }
 
     func save(lift: LiftRecord) throws {
-        guard lift.weight.isFinite, lift.weight > 0, let reps = Int16(exactly: lift.reps), reps > 0 else {
+        guard lift.weight.isFinite, lift.weight > 0, lift.reps.isFinite, lift.reps > 0, lift.reps <= 100 else {
             throw StoreError.unreadableValue
         }
         let context = container.viewContext
@@ -78,7 +78,7 @@ final class PersistenceController {
         object.setValue(lift.exerciseID, forKey: "exerciseID")
         object.setValue(lift.exerciseName, forKey: "exerciseName")
         object.setValue(lift.weight, forKey: "weight")
-        object.setValue(reps, forKey: "reps")
+        object.setValue(lift.reps, forKey: "reps")
         object.setValue(lift.unit.rawValue, forKey: "unit")
         object.setValue(lift.performedAt, forKey: "performedAt")
         try commit()
@@ -138,7 +138,7 @@ final class PersistenceController {
             let performedAt = object.value(forKey: "performedAt") as? Date
         else { return nil }
         let weight = object.value(forKey: "weight") as? Double ?? 0
-        let reps = Int(object.value(forKey: "reps") as? Int16 ?? 0)
+        let reps = object.value(forKey: "reps") as? Double ?? 0
         let unit = WeightUnit(rawValue: object.value(forKey: "unit") as? String ?? "") ?? .lb
         return LiftRecord(
             id: id,
@@ -185,7 +185,7 @@ final class PersistenceController {
         ])
         let lift = entity("Lift", attributes: [
             string("id"), string("exerciseID"), string("exerciseName"),
-            double("weight"), integer("reps"), string("unit", defaultValue: "lb"), date("performedAt"),
+            double("weight"), double("reps"), string("unit", defaultValue: "lb"), date("performedAt"),
         ])
         let chat = entity("ChatLine", attributes: [
             string("id"), string("role"), string("text"), date("createdAt"),
@@ -218,15 +218,6 @@ final class PersistenceController {
         let attribute = NSAttributeDescription()
         attribute.name = name
         attribute.attributeType = .doubleAttributeType
-        attribute.defaultValue = 0
-        attribute.isOptional = true
-        return attribute
-    }
-
-    private static func integer(_ name: String) -> NSAttributeDescription {
-        let attribute = NSAttributeDescription()
-        attribute.name = name
-        attribute.attributeType = .integer16AttributeType
         attribute.defaultValue = 0
         attribute.isOptional = true
         return attribute

@@ -3,7 +3,7 @@ public struct LogCommand: Equatable, Sendable {
     public var name: String
     public var aliases: [String]
     public var weight: Double
-    public var reps: Int
+    public var reps: Double
     public var unit: WeightUnit
 
     public init(
@@ -11,7 +11,7 @@ public struct LogCommand: Equatable, Sendable {
         name: String,
         aliases: [String],
         weight: Double,
-        reps: Int,
+        reps: Double,
         unit: WeightUnit
     ) {
         self.exerciseID = exerciseID

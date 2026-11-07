@@ -3,11 +3,11 @@ import Foundation
 public struct LiftSnippet: Equatable, Sendable {
     public var exerciseName: String
     public var weight: Double
-    public var reps: Int
+    public var reps: Double
     public var unit: WeightUnit
     public var performedAt: Date
 
-    public init(exerciseName: String, weight: Double, reps: Int, unit: WeightUnit, performedAt: Date) {
+    public init(exerciseName: String, weight: Double, reps: Double, unit: WeightUnit, performedAt: Date) {
         self.exerciseName = exerciseName
         self.weight = weight
         self.reps = reps

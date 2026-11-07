@@ -51,8 +51,14 @@ public enum ExerciseReconciler {
     }
 
     private static func modifiers(in text: String) -> Set<String> {
-        let tokens = Set(text.split(separator: " ").map(String.init))
-        let known: Set<String> = ["incline", "decline", "flat", "seated", "sumo", "front", "romanian", "close-grip"]
+        var tokens = Set(text.split(separator: " ").map(String.init))
+        if text.contains("close grip") || text.contains("close-grip") {
+            tokens.insert("close-grip")
+        }
+        let known: Set<String> = [
+            "incline", "decline", "flat", "seated", "sumo", "front", "romanian", "close-grip",
+            "hammer", "goblet", "ez-bar", "trap-bar", "stiff-leg", "bulgarian", "landmine",
+        ]
         return tokens.intersection(known)
     }
 

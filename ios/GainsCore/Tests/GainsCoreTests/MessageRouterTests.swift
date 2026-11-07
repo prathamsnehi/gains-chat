@@ -59,4 +59,40 @@ struct MessageRouterTests {
         #expect(snippets[0].weight == 165)
         #expect(snippets[0].reps == 5)
     }
+
+    @Test func aQuestionAboutACustomExerciseDoesNotBorrowAnotherLift() {
+        let mid = KnownExercise(id: "mid", name: "Mid Back Row", aliases: ["mid back row"])
+        let bench = KnownExercise(id: "bench", name: "Barbell Bench Press", aliases: ["bp"])
+        let midLift = LiftRecord(
+            id: "mid-lift",
+            exerciseID: "mid",
+            exerciseName: "Mid Back Row",
+            weight: 110,
+            reps: 8,
+            unit: .lb,
+            performedAt: Date(timeIntervalSince1970: 1_700_000_000)
+        )
+        let benchLift = LiftRecord(
+            id: "bench-lift",
+            exerciseID: "bench",
+            exerciseName: "Barbell Bench Press",
+            weight: 155,
+            reps: 5,
+            unit: .lb,
+            performedAt: Date(timeIntervalSince1970: 1_700_000_100)
+        )
+        let route = MessageRouter.decide(
+            text: "what did I last mid back row",
+            exercises: [mid, bench],
+            lifts: [midLift, benchLift],
+            scores: { _ in IntentScores(log: 0.2, question: 0.8) }
+        )
+        guard case .question(_, let snippets) = route else {
+            Issue.record("expected a question, got \(route)")
+            return
+        }
+        #expect(snippets.count == 1)
+        #expect(snippets[0].exerciseName == "Mid Back Row")
+        #expect(snippets[0].weight == 110)
+    }
 }

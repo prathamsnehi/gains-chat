@@ -2,7 +2,7 @@ public struct LiftDraft: Equatable, Sendable {
     public var canonicalName: String
     public var shorthand: String
     public var weight: Double
-    public var reps: Int
+    public var reps: Double
     public var unit: WeightUnit
     public var equipment: Equipment
     public var modifiers: [String]
@@ -11,7 +11,7 @@ public struct LiftDraft: Equatable, Sendable {
         canonicalName: String,
         shorthand: String,
         weight: Double,
-        reps: Int,
+        reps: Double,
         unit: WeightUnit,
         equipment: Equipment,
         modifiers: [String]

@@ -4,7 +4,7 @@ import GainsCore
 struct LiftEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var weight: Double
-    @State private var reps: Int
+    @State private var reps: Double
     @State private var unit: WeightUnit
     private let lift: LiftRecord
     var onSave: (LiftRecord) throws -> Void
@@ -25,7 +25,7 @@ struct LiftEditorSheet: View {
                 TextField("Weight", value: $weight, format: .number)
                     .keyboardType(.decimalPad)
                 TextField("Reps", value: $reps, format: .number)
-                    .keyboardType(.numberPad)
+                    .keyboardType(.decimalPad)
                 Picker("Unit", selection: $unit) {
                     Text("lb").tag(WeightUnit.lb)
                     Text("kg").tag(WeightUnit.kg)
@@ -43,7 +43,7 @@ struct LiftEditorSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save)
-                        .disabled(weight <= 0 || reps <= 0 || reps > Int(Int16.max))
+                        .disabled(weight <= 0 || reps <= 0 || reps > 100)
                 }
             }
         }

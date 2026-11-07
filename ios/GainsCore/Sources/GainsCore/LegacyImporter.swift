@@ -57,7 +57,7 @@ public enum LegacyImporter {
             exerciseID: exerciseID,
             exerciseName: name,
             weight: weight,
-            reps: Int(reps.rounded()),
+            reps: reps,
             unit: unit,
             performedAt: performedAt
         )

@@ -15,7 +15,8 @@ struct LiftRow: View {
 
     private var value: String {
         let weight = lift.weight.formatted(.number.precision(.fractionLength(0...1)))
-        return "\(weight) \(lift.unit.label) × \(lift.reps)"
+        let reps = lift.reps.formatted(.number.precision(.fractionLength(0...1)))
+        return "\(weight) \(lift.unit.label) × \(reps)"
     }
 }
 

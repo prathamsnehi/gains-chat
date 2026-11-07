@@ -60,7 +60,7 @@ public enum ShorthandParser {
 
     private struct Assignment {
         var weight: Double
-        var reps: Int
+        var reps: Double
         var unit: WeightUnit
     }
 
@@ -93,7 +93,7 @@ public enum ShorthandParser {
             return nil
         }
         let unit: WeightUnit = isKilogram(weight.marker) || meaningful.contains { isKilogram($0.marker) } ? .kg : .lb
-        return Assignment(weight: weight.value, reps: Int(reps.value.rounded()), unit: unit)
+        return Assignment(weight: weight.value, reps: reps.value, unit: unit)
     }
 
     private static func extractNumbers(_ text: String) -> [FoundNumber] {
@@ -116,7 +116,7 @@ public enum ShorthandParser {
     }
 
     private static func marker(in tail: Substring) -> String {
-        let pattern = #"^\s*(kg|kgs|kilograms?|lb|lbs|pounds?|reps?|sets?|r\b|x\b|×)"#
+        let pattern = #"^\s*(kgs?|kilograms?|lbs?|pounds?|reps?|sets?|s\b|r\b|x\b|×)"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
             return ""
         }
@@ -130,7 +130,7 @@ public enum ShorthandParser {
         if word == "x" || word == "×" { return "" }
         if word == "r" || word.hasPrefix("rep") { return "reps" }
         if word.hasPrefix("kg") || word.hasPrefix("kilo") { return "kg" }
-        if word.hasPrefix("lb") || word.hasPrefix("pound") { return "lb" }
+        if word == "s" || word.hasPrefix("lb") || word.hasPrefix("pound") { return "lb" }
         return ""
     }
 

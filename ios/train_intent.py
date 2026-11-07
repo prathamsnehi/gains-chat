@@ -34,41 +34,23 @@ def hash_bytes(gram: bytes) -> int:
 
 
 def samples():
-    logs = [
-        "bp 155 5",
-        "bp 135 8",
-        "bp 185 3",
-        "bp 225 x 5",
-        "bp 60 kg 5",
-        "bench 185 5",
-        "bench press 195 for 5",
-        "incline bp 135 6",
-        "incline db bp 55 7 reps",
-        "incline db bp 50 8",
-        "db bp 50 10",
-        "db bp 40 12",
-        "decline bp 185 6",
-        "squat 225 5",
-        "squat 315 x 3",
-        "sq 185 5",
-        "front squat 155 5",
-        "dl 315 3",
-        "dl 405 1",
-        "deadlift 275 5",
-        "rdl 185 8",
-        "rdl 135 10",
-        "ohp 95 5",
-        "ohp 115 x 5",
-        "overhead press 105 6",
-        "row 135 8",
-        "barbell row 155 6",
-        "db row 70 10",
-        "db curl 30 12",
-        "curl 25 12",
-        "hammer curl 35 10",
-        "pullup 10 8",
-        "lat pulldown 120 10",
-        "prowler 90 4",
+    # The classifier only separates a log from a question. Exercise names are
+    # examples of shape, including names nobody has logged yet. The phone creates
+    # the exercise from the words; this model never chooses an exercise id.
+    movements = [
+        "bp", "bench", "bench press", "flat bench", "close grip bench",
+        "close grip bench press", "cgbp", "incline bp", "incline bench",
+        "incline db bp", "incline dumbbell press", "incline db press",
+        "db bp", "dumbbell bench", "decline bench", "squat", "back squat",
+        "front squat", "goblet squat", "dl", "deadlift", "rdl", "romanian deadlift",
+        "sumo deadlift", "ohp", "overhead press", "shoulder press", "push press",
+        "row", "barbell row", "batbell row", "db row", "pendlay row",
+        "bicep curls", "biceps curl", "barbell curl", "hammer curl", "db curl",
+        "tricep pushdowns", "triceps pushdown", "skull crushers",
+        "lat pulldown", "pullup", "chinup", "dip", "lateral raise", "face pull",
+        "mid back row", "mid back rows", "belt squat", "jm press", "hip thrust",
+        "bulgarian split squat", "leg press", "leg curl", "calf raise",
+        "kettlebell swing", "farmer carry", "reverse hyper", "good morning",
     ]
     questions = [
         "what was the last weight I did on the bench press",
@@ -89,19 +71,28 @@ def samples():
         "tell me about my deadlift",
         "is 155 a good bench",
         "what was the last weight I did on the bench",
+        "what did I last mid back row",
+        "how should I progress on close grip bench",
+        "what was the last weight I did on bicep curls",
     ]
-    rows = [(phrase, 1) for phrase in logs] + [(phrase, 0) for phrase in questions]
-    extra_logs = []
-    for movement in ["bp", "squat", "dl", "ohp", "row", "rdl", "incline db bp"]:
-        for weight in [45, 65, 95, 135, 185, 225]:
-            for reps in [3, 5, 8, 10]:
-                extra_logs.append(f"{movement} {weight} {reps}")
-    extra_questions = []
-    for opener in ["what was", "how is", "did I do", "should I repeat"]:
-        for target in ["bench", "squat", "deadlift", "press", "my last session", "that workout"]:
-            extra_questions.append(f"{opener} {target}")
-    rows.extend((phrase, 1) for phrase in extra_logs)
-    rows.extend((phrase, 0) for phrase in extra_questions)
+    rows = [(phrase, 0) for phrase in questions]
+    weights = [17.5, 32.5, 55, 95, 110, 135, 145, 155, 185, 225, 315]
+    rep_counts = [3, 5, 6, 6.5, 7, 7.5, 8, 10, 12]
+    for movement in movements:
+        for weight in weights[::3]:
+            for reps in (5, 8):
+                rows.append((f"{movement} {weight} {reps}", 1))
+                rows.append((f"{movement} {weight}x{reps}", 1))
+                rows.append((f"{movement} {weight} for {reps}", 1))
+                rows.append((f"{movement} {weight}lbs {reps} reps", 1))
+                rows.append((f"{movement} {weight}s {reps} reps", 1))
+        rows.append((f"what did I last {movement}", 0))
+        rows.append((f"what was the last weight I did on {movement}", 0))
+        rows.append((f"how should I progress on {movement}", 0))
+    for weight in weights:
+        for reps in rep_counts[::2]:
+            rows.append((f"bp {weight} {reps}", 1))
+            rows.append((f"squat {weight} x {reps}", 1))
     return rows
 
 
@@ -166,9 +157,22 @@ def main():
         "incline db bp 55 7 reps": 1,
         "squat 225 x 5": 1,
         "rdl 185 8": 1,
+        "Close grip bench 135 7 reps": 1,
+        "Bicep curls 32.5s 6.5 reps": 1,
+        "Tricep pushdowns 17.5 7.5 reps": 1,
+        "Batbell row 110x7": 1,
+        "Mid back rows 110 8 reps": 1,
+        "Incline dumbbell press 55s 6 reps": 1,
+        "Close grip bench press, 145lbs 6 reps": 1,
+        "Mid back row 110lbs 7 reps": 1,
+        "Bench 225 for 5": 1,
+        "belt squat 180 6": 1,
         "what was the last weight I did on the bench press": 0,
         "how should I progress": 0,
         "what did I last squat": 0,
+        "what did I last mid back row": 0,
+        "how should I progress on close grip bench": 0,
+        "what was the last weight I did on bicep curls": 0,
     }
     for phrase, label in holdout.items():
         probability = classifier.predict_proba(featurize(phrase).reshape(1, -1))[0, list(classifier.classes_).index(1)]

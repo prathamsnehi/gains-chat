@@ -56,4 +56,43 @@ struct ExerciseReconcilerTests {
         }
         #expect(name == "Barbell Bench Press")
     }
+
+    @Test func aCustomNameIsCreatedAndThenMatchedFromAnotherSpelling() {
+        guard case .lift(let draft) = ShorthandParser.parse("Mid back rows 110 8 reps") else {
+            Issue.record("expected a lift")
+            return
+        }
+        let created = ExerciseReconciler.reconcile(draft, with: [])
+        guard case .created(let name, let aliases) = created else {
+            Issue.record("expected create, got \(created)")
+            return
+        }
+        #expect(name == "Mid Back Row")
+        let existing = KnownExercise(id: "mid", name: name, aliases: aliases)
+        guard case .lift(let again) = ShorthandParser.parse("Mid back row 110lbs 7 reps") else {
+            Issue.record("expected a lift")
+            return
+        }
+        let matched = ExerciseReconciler.reconcile(again, with: [existing])
+        guard case .matched(let id, let matchedName, _) = matched else {
+            Issue.record("expected match, got \(matched)")
+            return
+        }
+        #expect(id == "mid")
+        #expect(matchedName == "Mid Back Row")
+    }
+
+    @Test func closeGripDoesNotAttachToAPlainBench() {
+        let bench = KnownExercise(id: "bench", name: "Barbell Bench Press", aliases: ["bp", "bench"])
+        guard case .lift(let draft) = ShorthandParser.parse("Close grip bench 135 7 reps") else {
+            Issue.record("expected a lift")
+            return
+        }
+        let result = ExerciseReconciler.reconcile(draft, with: [bench])
+        guard case .created(let name, _) = result else {
+            Issue.record("expected a separate close-grip exercise, got \(result)")
+            return
+        }
+        #expect(name == "Close-Grip Barbell Bench Press")
+    }
 }
