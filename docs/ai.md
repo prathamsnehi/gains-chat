@@ -1,0 +1,13 @@
+# AI message path
+
+Every online message goes to `processMessage`, a Firebase callable requiring anonymous Firebase Auth and App Check. Jev `jev-1.13.0` chooses intent, exercise, and ambiguous number roles from a short candidate list. Its probabilities trigger clarification when uncertain. Numeric values come from the original text and are validated in server code. Jev neither writes a lift nor generates chat.
+
+Gemini handles casual conversation with a concise gym companion persona. It should avoid unsolicited mentoring and never claim to have saved a lift. For history questions, the phone supplies relevant local records, including recent and best sets for the named exercise; unknown exercise names produce no records rather than another exercise's history. Gemini can answer only from those snippets. The phone validates and saves a lift draft. Response kinds are `lift_draft`, `history_request`, `chat_reply`, `clarification`, and `error`.
+
+Limits are 30 messages per Firebase identity per hour, 100 per day, and 1,000 service-wide per day. Completed responses are cached by identity and request ID; a fresh duplicate does not call Jev again, and a stale unfinished retry is charged against the limits. Functions have zero minimum instances. The durable queue persists each immutable request, including the separate history-follow-up phase, before sending. Client logs queue delay, callable time, and processing time; server logs total, Jev, and Gemini times with a cold-start flag. Targets are immediate pending feedback and a warm median lift confirmation under two seconds. No live latency claim is made yet.
+
+Parser and quota tests are in `functions/ai/*.test.js`; local history retrieval tests are in `frontend/services/insights.test.ts`. Add real-world phrases as exercise names and abbreviations evolve. An uncertain choice should lead to correction, never a saved lift. A failed queued message shows its error beside the pending chat message and can be retried in order.
+
+Provider execution has a 24-second budget from invocation start within the 30-second callable. Jev is capped at 8 seconds and Gemini at 12 seconds, each further capped by remaining budget. Gemini SDK retries are explicitly disabled (`attempts: 1`); retry responsibility stays with the durable client queue. Cancellation cannot guarantee a provider did not process or bill the request.
+
+The Gemini SDK is 2.30.0; the existing model remains `gemini-2.5-flash`. Jev stays pinned to stable `jev-1.13.0`. Both authenticated synthetic availability checks passed during migration. Preview model changes are a separate behavior/cost evaluation.

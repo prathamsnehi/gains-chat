@@ -1,4 +1,8 @@
 {
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "functions": [
     {
       "source": "functions",
@@ -8,8 +12,17 @@
         ".git",
         "firebase-debug.log",
         "firebase-debug.*.log",
-        "*.local"
-      ]
+        "*.local",
+        ".yarn/cache",
+        ".yarn/unplugged",
+        ".yarn/install-state.gz",
+        ".yarn/build-state.yml",
+        "**/*.test.js",
+        "scripts",
+        "audit-*.jsonl",
+        "*.log"
+      ],
+      "runtime": "nodejs24"
     }
   ]
 }

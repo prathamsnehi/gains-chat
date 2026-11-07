@@ -1,16 +1,64 @@
 // functions/index.js
-const { onRequest } = require("firebase-functions/v2/https");
+const {
+  onRequest,
+  onCall,
+  HttpsError,
+} = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 
 const { defineSecret } = require("firebase-functions/params");
 const app = require("./app");
 const { cleanupExpiredRateLimits } = require("./utils/cleanupRateLimits");
 
-const DB_URI = defineSecret("DB_URI");
-const JWT_SECRET = defineSecret("JWT_SECRET");
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
+const TYPESAFE_API_KEY = defineSecret("TYPESAFE_API_KEY");
+const { processMessageCore } = require("./ai/messageService");
+const { getApps, initializeApp } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
 
-exports.api = onRequest({ secrets: [DB_URI, JWT_SECRET, GEMINI_API_KEY] }, app);
+if (!getApps().length) initializeApp();
+
+exports.processMessage = onCall(
+  {
+    enforceAppCheck: true,
+    minInstances: 0,
+    secrets: [TYPESAFE_API_KEY, GEMINI_API_KEY],
+    timeoutSeconds: 30,
+  },
+  async (request) => {
+    if (!request.auth?.uid)
+      throw new HttpsError(
+        "unauthenticated",
+        "Sign in before sending a message.",
+      );
+    try {
+      return await processMessageCore({
+        data: request.data,
+        uid: request.auth.uid,
+        db: getFirestore(),
+        jevKey: TYPESAFE_API_KEY.value(),
+        geminiKey: GEMINI_API_KEY.value(),
+        logger: require("firebase-functions/logger"),
+      });
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      if (/^INVALID_(INPUT|REQUEST_ID|TEXT|CANDIDATES)$/.test(error.message))
+        throw new HttpsError(
+          "invalid-argument",
+          "Check the message and exercise candidates.",
+        );
+      require("firebase-functions/logger").error("processMessage failed", {
+        code: error.code || error.name || "unknown",
+      });
+      throw new HttpsError(
+        "unavailable",
+        "Message processing is temporarily unavailable. Retry this message.",
+      );
+    }
+  },
+);
+
+exports.api = onRequest(app);
 
 exports.cleanupRateLimits = onSchedule(
   {
@@ -25,5 +73,5 @@ exports.cleanupRateLimits = onSchedule(
     } catch (error) {
       console.error("Rate limit cleanup failed:", error);
     }
-  }
+  },
 );

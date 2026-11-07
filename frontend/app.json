@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "Gains Chat",
+    "slug": "gains-chat",
+    "version": "2.0.0",
+    "platforms": ["ios"],
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.blackmaskexe.gainschat",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "entitlements": {
+        "com.apple.developer.icloud-services": ["CloudKit"],
+        "com.apple.developer.icloud-container-identifiers": [
+          "iCloud.com.blackmaskexe.gainschat"
+        ],
+        "com.apple.developer.devicecheck.appattest-environment": "production",
+        "aps-environment": "development"
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["remote-notification"]
+      },
+      "appleTeamId": "T296YJXC87"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "@react-native-vector-icons/ionicons/app.plugin",
+      "@react-native-firebase/app",
+      "@react-native-firebase/app-check",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "dynamic",
+            "deploymentTarget": "16.4"
+          }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "./plugins/withNativeServiceInitialization"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "50b34f80-9b2c-4335-af07-2a501c387f25"
+      }
+    }
+  }
+}

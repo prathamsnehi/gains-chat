@@ -1,0 +1,70 @@
+{
+  "name": "gains-chat",
+  "main": "expo-router/entry",
+  "version": "2.0.0",
+  "private": true,
+  "packageManager": "yarn@4.18.1",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test data/appCheckReadiness.test.ts services/*.test.ts plugins/*.test.js",
+    "doctor": "expo-doctor",
+    "audit": "yarn npm audit --all --recursive",
+    "audit:production": "yarn npm audit --all --recursive --environment production",
+    "eas": "node ../tooling/node_modules/eas-cli/bin/run",
+    "check:sdk": "node scripts/check-sdk-versions.cjs",
+    "check:native": "node scripts/check-native-configuration.cjs"
+  },
+  "dependencies": {
+    "@react-native-community/netinfo": "12.0.1",
+    "@react-native-firebase/app": "26.4.0",
+    "@react-native-firebase/app-check": "26.4.0",
+    "@react-native-firebase/auth": "26.4.0",
+    "@react-native-firebase/functions": "26.4.0",
+    "@react-native-vector-icons/ionicons": "13.1.0",
+    "expo": "58.0.14",
+    "expo-build-properties": "~58.0.11",
+    "expo-constants": "~58.0.12",
+    "expo-dev-client": "~58.0.14",
+    "expo-font": "58.0.8",
+    "expo-linking": "~58.0.13",
+    "expo-router": "58.0.23",
+    "expo-splash-screen": "~58.0.10",
+    "expo-status-bar": "~58.0.3",
+    "expo-system-ui": "~58.0.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-gesture-handler": "~3.3.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/node": "^24.0.0",
+    "@types/react": "~19.3.0",
+    "babel-preset-expo": "~58.0.17",
+    "expo-doctor": "1.21.5",
+    "prettier": "^3.6.2",
+    "react-refresh": "^0.14.2",
+    "tsx": "^4.23.15",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "resolutions": {
+    "@firebase/firestore/@grpc/grpc-js": "^1.13.6",
+    "xcode/uuid": "11.1.1"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "expo",
+        "expo-router",
+        "expo-font"
+      ]
+    }
+  }
+}

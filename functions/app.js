@@ -1,53 +1,30 @@
-// functions/app.js
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const { defineSecret } = require("firebase-functions/params");
-const admin = require("firebase-admin");
+const { readFileSync } = require("node:fs");
+const { join } = require("node:path");
 
-const DB_URI = defineSecret("DB_URI"); // matches your secret name
+const privacyPolicy = readFileSync(
+  join(__dirname, "privacy-policy.html"),
+  "utf8",
+);
 
-const adminRoutes = require("./routes/admin");
-const userRoutes = require("./routes/users");
-
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
-const app = express();
-
-app.set("view engine", "ejs");
-app.set("views", "views");
-
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-app.use(adminRoutes);
-app.use(userRoutes);
-
-app.get("/", (req, res) => {
-  res.json("API up and running");
-});
-
-async function connectDb() {
-  if (mongoose.connection.readyState === 1) return;
-  const uri = await DB_URI.value();
-  return mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-}
-
-app.use(async (req, res, next) => {
-  try {
-    await connectDb();
-    next();
-  } catch (err) {
-    next(err);
+// Keep the published privacy URL while retiring the former HTTP API.
+module.exports = (req, res) => {
+  const pathname = new URL(req.url, "https://gainschat.invalid").pathname;
+  if (
+    (req.method === "GET" || req.method === "HEAD") &&
+    pathname === "/privacy-policy"
+  ) {
+    res.set("Content-Type", "text/html; charset=utf-8");
+    res.set(
+      "Content-Security-Policy",
+      "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
+    );
+    res.set("X-Content-Type-Options", "nosniff");
+    return res.status(200).send(req.method === "HEAD" ? "" : privacyPolicy);
   }
-});
-
-module.exports = app;
+  return res
+    .status(410)
+    .json({
+      error:
+        "This API has been retired. Update Gains Chat to use on-device storage.",
+    });
+};

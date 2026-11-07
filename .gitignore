@@ -1,4 +1,5 @@
 # Logs
+.DS_Store
 logs
 *.log
 npm-debug.log*
@@ -46,6 +47,11 @@ build/Release
 
 # Dependency directories
 node_modules/
+**/.yarn/*
+!**/.yarn/releases/
+!**/.yarn/patches/
+audit-*.jsonl
+frontend/dist/
 
 # Optional npm cache directory
 .npm
@@ -64,6 +70,11 @@ node_modules/
 
 # dotenv environment variables file
 .env
+frontend/GoogleService-Info.plist
+frontend/.expo/
+frontend/ios/
+frontend/android/
+recent-workouts.private.json
 
 # dataconnect generated files
 .dataconnect
