@@ -3,6 +3,9 @@ import NetInfo from "@react-native-community/netinfo";
 import { localStore } from "@/data/localStore";
 import { ensureAnonymousAuth, processMessage } from "@/data/aiClient";
 import { historyLiftsForQuestion } from "./insights";
+import { createDurableQueue } from "./durableQueue";
+import type { PendingMessage } from "@/data/localStore";
+export type { PendingMessage } from "@/data/localStore";
 
 export type Lift = {
   id: string;
@@ -15,7 +18,6 @@ export type Lift = {
   createdAt?: string;
   updatedAt?: string;
   requestId?: string;
-  legacyId?: string;
 };
 export type Exercise = {
   id: string;
@@ -38,16 +40,6 @@ export type ChatMessage = {
   status?: "pending" | "processing" | "sent" | "error";
   options?: Array<{ id: string; name: string }>;
   sourceText?: string;
-};
-export type PendingMessage = {
-  id: string;
-  requestId: string;
-  text: string;
-  createdAt: string;
-  status: "pending" | "processing";
-  selectedExerciseId?: string;
-  attemptCount?: number;
-  lastError?: string;
 };
 export type Snapshot = {
   lifts: Lift[];
@@ -90,7 +82,6 @@ const empty: Snapshot = {
 };
 let snapshot: Snapshot = empty;
 let listeners = new Set<() => void>();
-let draining = false;
 let initialized = false;
 const clarificationLocks = new Set<string>();
 
@@ -218,10 +209,13 @@ function normalize(raw: any): Snapshot {
 
 function pendingError(error: unknown): string {
   const code = String((error as { code?: unknown })?.code ?? "");
-  if (code.includes("resource-exhausted")) return "Message limit reached. Try again later.";
+  if (code.includes("resource-exhausted"))
+    return "Message limit reached. Try again later.";
   if (code.includes("unauthenticated")) return "Sign-in failed. Tap retry.";
-  if (code.includes("permission-denied")) return "App verification failed. Tap retry after setup is checked.";
-  if (code.includes("invalid-argument")) return "This message needs a correction before it can be sent.";
+  if (code.includes("permission-denied"))
+    return "App verification failed. Tap retry after setup is checked.";
+  if (code.includes("invalid-argument"))
+    return "This message needs a correction before it can be sent.";
   return "Couldn't process this message. Tap retry.";
 }
 
@@ -236,8 +230,6 @@ export const bridge = {
   async initialize() {
     if (!initialized) {
       await localStore.initialize();
-      const previousDeviceData = await localStore.migratePreviousDeviceStorage();
-      if (previousDeviceData.warnings.length) console.warn("Gains Chat previous device import", previousDeviceData.warnings);
       initialized = true;
     }
     await this.refresh();
@@ -282,7 +274,10 @@ export const bridge = {
   },
   async send(
     text: string,
-    options: { skipLocalCorrection?: boolean; selectedExerciseId?: string } = {},
+    options: {
+      skipLocalCorrection?: boolean;
+      selectedExerciseId?: string;
+    } = {},
   ) {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -343,7 +338,8 @@ export const bridge = {
     if (clarificationLocks.has(messageId)) return;
     const message = snapshot.messages.find((item) => item.id === messageId);
     const exercise = snapshot.exercises.find((item) => item.id === exerciseId);
-    if (!message?.sourceText || !exercise) throw new Error("This correction is no longer available.");
+    if (!message?.sourceText || !exercise)
+      throw new Error("This correction is no longer available.");
     clarificationLocks.add(messageId);
     try {
       const alias = message.sourceText
@@ -353,7 +349,11 @@ export const bridge = {
         .replace(/[^a-z ]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
-      if (alias.length >= 3 && alias.length <= 50 && alias !== exercise.name.toLowerCase())
+      if (
+        alias.length >= 3 &&
+        alias.length <= 50 &&
+        alias !== exercise.name.toLowerCase()
+      )
         await this.addAlias(exerciseId, alias);
       await this.send(message.sourceText, {
         skipLocalCorrection: true,
@@ -369,183 +369,141 @@ export const bridge = {
       clarificationLocks.delete(messageId);
     }
   },
-  async processPending() {
-    if (draining) return;
-    draining = true;
-    let queue: PendingMessage[] = [];
-    try {
-      queue = (
-        (await localStore.listPendingMessages()) as PendingMessage[]
-      ).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-      if (!queue.length) return;
-      const network = await NetInfo.fetch();
-      if (network.isConnected === false) return;
-      await ensureAnonymousAuth();
-      for (const item of queue) {
-        const processingStarted = Date.now();
-        let functionMs = 0;
-        const current = normalize(await localStore.loadSnapshot());
-        const recentMessages = current.messages
-          .filter((m) => m.id !== item.id && m.status !== "pending")
-          .slice(-8)
-          .map((m) => ({ role: m.role, text: m.text }));
-        const candidates = candidateList(
-          item.text,
-          current.exercises,
-          current.lifts,
-        );
-        if (
-          item.selectedExerciseId &&
-          !candidates.some((candidate) => candidate.id === item.selectedExerciseId)
-        ) {
-          const selected = current.exercises.find(
-            (exercise) => exercise.id === item.selectedExerciseId,
-          );
-          if (selected)
-            candidates.splice(0, 1, {
-              id: selected.id,
-              name: selected.name,
-              aliases: selected.aliases,
-            });
-        }
-        try {
-          await localStore.updatePendingMessage({
-            ...item,
-            status: "processing",
-            lastError: undefined,
-          });
-          const firstCallStarted = Date.now();
-          let response = (await processMessage({
-            requestId: item.requestId,
-            text: item.text,
-            candidates,
-            recentMessages,
-            selectedExerciseId: item.selectedExerciseId,
-          })) as MessageResponse;
-          functionMs += Date.now() - firstCallStarted;
-          if (response.requestId !== item.requestId)
-            throw new Error("Response request ID did not match.");
-          if (response.kind === "history_request") {
-            const historySnippets = historyLiftsForQuestion(
-              item.text,
-              current.lifts,
-              current.exercises,
-            ).map((l) => ({
-              exerciseName: l.exerciseName,
-              weight: l.weight,
-              reps: l.reps,
-              unit: l.unit,
-              date: l.performedAt,
-            }));
-            const retryRequestId = makeId("request");
-            await localStore.updatePendingMessage({
-              ...item,
-              requestId: retryRequestId,
-              status: "processing",
-            });
-            const historyCallStarted = Date.now();
-            response = (await processMessage({
-              requestId: retryRequestId,
-              text: item.text,
-              candidates,
-              recentMessages,
-              historySnippets,
-              historyLookupComplete: true,
-            })) as MessageResponse;
-            functionMs += Date.now() - historyCallStarted;
-            if (response.requestId !== retryRequestId)
-              throw new Error("Response request ID did not match.");
-          }
-          if (response.kind === "lift_draft") {
-            const draft = response.draft;
-            const exercise = current.exercises.find(
-              (e) => e.id === draft.exerciseId,
-            );
-            const valid =
-              !!exercise &&
-              Number.isFinite(draft.weight) &&
-              draft.weight > 0 &&
-              Number.isFinite(draft.reps) &&
-              draft.reps > 0 &&
-              (draft.unit === "lb" || draft.unit === "kg");
-            if (!valid)
-              throw new Error(
-                "The lift needs a correction before it can be saved.",
-              );
-            const existing = current.lifts.find((l) => l.requestId === item.id);
-            if (!existing)
-              await localStore.upsertLift({
-                id: makeId("lift"),
-                exerciseId: draft.exerciseId,
-                exerciseName: exercise!.name,
-                weight: draft.weight,
-                reps: draft.reps,
-                unit: draft.unit,
-                performedAt: item.createdAt,
-                createdAt: item.createdAt,
-                updatedAt: new Date().toISOString(),
-                requestId: item.id,
-              });
-          }
-          const assistant: ChatMessage = {
-            id: `reply-${item.id}`,
-            role: "assistant",
-            text: response.kind === "clarification" && !response.options?.length
-              ? `${response.message} Send the full set again with exercise, weight, and reps.`
-              : response.message,
-            createdAt: new Date().toISOString(),
-            status: "sent",
-            options: response.kind === "clarification" ? response.options : undefined,
-            sourceText: response.kind === "clarification" ? item.text : undefined,
-          };
-          await localStore.upsertChatMessage(assistant);
-          await localStore.upsertChatMessage({
-            id: item.id,
-            role: "user",
-            text: item.text,
-            createdAt: item.createdAt,
-            status: "sent",
-          });
-          await localStore.deletePendingMessage(item.id);
-          await this.refresh();
-          console.info("Gains Chat client timing", {
-            requestId: item.id,
-            queueDelayMs: Math.max(0, processingStarted - Date.parse(item.createdAt)),
-            functionMs,
-            processingMs: Date.now() - processingStarted,
-            kind: response.kind,
-          });
-        } catch (error) {
-          await localStore.updatePendingMessage({
-            ...item,
-            status: "pending",
-            attemptCount: (item.attemptCount ?? 0) + 1,
-            lastError: pendingError(error),
-          });
-          await this.refresh();
-          break; // Keep the durable queue in order; retry when online or foregrounded.
-        }
-      }
-    } catch (error) {
-      // Auth and native initialization can fail before an individual request starts.
-      if (queue[0]) {
-        await localStore.updatePendingMessage({
-          ...queue[0],
-          status: "pending",
-          attemptCount: (queue[0].attemptCount ?? 0) + 1,
-          lastError: pendingError(error),
-        }).catch(() => {});
-        await this.refresh().catch(() => {});
-      }
-    } finally {
-      draining = false;
-    }
-  },
+  processPending: () => queue.drain(),
 };
 
+const queue = createDurableQueue({
+  store: localStore,
+  async prepare() {
+    const network = await NetInfo.fetch();
+    if (network.isConnected === false) throw new Error("OFFLINE");
+    await ensureAnonymousAuth();
+  },
+  async buildRequest(item) {
+    const current = normalize(await localStore.loadSnapshot());
+    const candidates = candidateList(
+      item.text,
+      current.exercises,
+      current.lifts,
+    );
+    if (
+      item.selectedExerciseId &&
+      !candidates.some((candidate) => candidate.id === item.selectedExerciseId)
+    ) {
+      const selected = current.exercises.find(
+        (exercise) => exercise.id === item.selectedExerciseId,
+      );
+      if (selected)
+        candidates.splice(0, 1, {
+          id: selected.id,
+          name: selected.name,
+          aliases: selected.aliases,
+        });
+    }
+    return {
+      requestId: item.requestId,
+      text: item.text,
+      candidates,
+      recentMessages: current.messages
+        .filter(
+          (message) => message.id !== item.id && message.status !== "pending",
+        )
+        .slice(-8)
+        .map((message) => ({ role: message.role, text: message.text })),
+      selectedExerciseId: item.selectedExerciseId,
+    };
+  },
+  async buildHistoryRequest(request) {
+    const current = normalize(await localStore.loadSnapshot());
+    return {
+      ...request,
+      requestId: makeId("request"),
+      historyLookupComplete: true,
+      historySnippets: historyLiftsForQuestion(
+        request.text,
+        current.lifts,
+        current.exercises,
+      ).map((lift) => ({
+        exerciseName: lift.exerciseName,
+        weight: lift.weight,
+        reps: lift.reps,
+        unit: lift.unit,
+        date: lift.performedAt,
+      })),
+    };
+  },
+  send: processMessage,
+  async complete(item, response, timing) {
+    const persistenceStarted = Date.now();
+    const current = normalize(await localStore.loadSnapshot());
+    if (response.kind === "lift_draft") {
+      const draft = response.draft;
+      const exercise = current.exercises.find((e) => e.id === draft.exerciseId);
+      const valid =
+        !!exercise &&
+        Number.isFinite(draft.weight) &&
+        draft.weight > 0 &&
+        Number.isFinite(draft.reps) &&
+        draft.reps > 0 &&
+        (draft.unit === "lb" || draft.unit === "kg");
+      if (!valid)
+        throw new Error("The lift needs a correction before it can be saved.");
+      const existing = current.lifts.find((l) => l.requestId === item.id);
+      if (!existing)
+        await localStore.upsertLift({
+          id: makeId("lift"),
+          exerciseId: draft.exerciseId,
+          exerciseName: exercise!.name,
+          weight: draft.weight,
+          reps: draft.reps,
+          unit: draft.unit,
+          performedAt: item.createdAt,
+          createdAt: item.createdAt,
+          updatedAt: new Date().toISOString(),
+          requestId: item.id,
+        });
+    }
+    const assistant: ChatMessage = {
+      id: `reply-${item.id}`,
+      role: "assistant",
+      text:
+        response.kind === "clarification" && !response.options?.length
+          ? `${response.message} Send the full set again with exercise, weight, and reps.`
+          : response.message,
+      createdAt: new Date().toISOString(),
+      status: "sent",
+      options: response.kind === "clarification" ? response.options : undefined,
+      sourceText: response.kind === "clarification" ? item.text : undefined,
+    };
+    await localStore.upsertChatMessage(assistant);
+    await localStore.upsertChatMessage({
+      id: item.id,
+      role: "user",
+      text: item.text,
+      createdAt: item.createdAt,
+      status: "sent",
+    });
+    await localStore.deletePendingMessage(item.id);
+    await bridge.refresh();
+    console.info("Gains Chat client timing", {
+      requestId: item.id,
+      ...timing,
+      processingMs: timing.processingMs + Date.now() - persistenceStarted,
+      kind: response.kind,
+    });
+  },
+  failed: async () => {
+    await bridge.refresh().catch(() => {});
+  },
+  errorMessage: pendingError,
+});
+
 NetInfo.addEventListener((state) => {
-  if (state.isConnected) void bridge.processPending();
+  if (initialized && state.isConnected) void bridge.processPending();
 });
 AppState.addEventListener("change", (state) => {
-  if (state === "active") void bridge.processPending();
+  if (initialized && state === "active") {
+    void bridge.refresh().catch(() => {});
+    void bridge.processPending();
+  }
 });

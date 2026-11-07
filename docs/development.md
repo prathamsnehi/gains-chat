@@ -1,19 +1,51 @@
 # Development
 
-Requirements: Node 22, npm, Xcode and iOS signing, an Apple Developer account with `iCloud.com.blackmaskexe.gainschat`, Expo/EAS access, and Firebase project `gains-chat`. Local Expo native builds also require CocoaPods 1.15.2 or later; EAS supplies its own native tooling. Firebase Functions run on Node 22, declared in `functions/package.json`. The native Core Data module needs a development build; Expo Go cannot run it.
+Use Node 24.21.0 (`.node-version`), Yarn 4.18.1, iOS 16.4 or later, Xcode 27 and CocoaPods 1.17.0. EAS profiles pin stable Xcode 27.0; the local validation host has Xcode 27.1 RC. Expo Go cannot run the custom Core Data or Firebase native modules.
 
-1. In `frontend/`, run `npm ci` and `npm run typecheck`.
-2. Put the Firebase Apple config at `frontend/GoogleService-Info.plist` for bundle ID `com.blackmaskexe.gainschat`. This file is ignored by Git but included in the EAS source upload by the root `.easignore`. A **file** environment variable named `GOOGLE_SERVICES_PLIST` can supply an alternate path; `app.config.js` uses it when present.
-3. Enable Firebase Anonymous Auth, configure App Check for the iOS app with App Attest, and enable Firestore. SDK 55 targets iOS 15 or later, so this app uses App Attest directly and needs no DeviceCheck private key. Register a debug token for development builds. The app waits for a valid App Check token before Auth/callables; it retries only the brief native provider setup race. The callables require valid App Check tokens.
-4. Configure Firebase secrets `TYPESAFE_API_KEY`, `GEMINI_API_KEY`, and `DB_URI`; the temporary HTTP API also uses `JWT_SECRET`. Never commit these. In `functions/`, run `npm test` and `npm run check:firestore`. The Firestore check uses the installed Firebase CLI's index/TTL validator without deployment; Firebase compiles rules syntax during deployment.
-5. Build a signed development client with `eas build --profile development --platform ios`, install it, then run `npm start` in `frontend/`.
+## Install and check
 
-Run the additional release initialization checks with `node --import tsx --test data/appCheckReadiness.test.ts plugins/withNativeServiceInitialization.test.js` from `frontend/`. The native transform tests compose the installed RNFirebase Expo plugins in both orders and verify a single Firebase initialization after the App Check factory.
+Each directory owns its own dependencies; there is no root workspace. The separate tooling project keeps EAS CLI out of the Expo application dependency tree, as Expo Doctor requires.
 
-Keep only route components in `frontend/app/`. Shared components, screens, navigation, services, and tests live outside it so Expo Router does not package them as routes. Before an EAS release build, run `npm test`, `npm run typecheck`, `npm run doctor`, and `npx expo export --platform ios --output-dir ios/verification-export` in `frontend/`. Expo Doctor needs network access; a local CocoaPods warning must be resolved before building the full Expo app locally.
+```sh
+cd frontend
+node .yarn/releases/yarn-4.18.1.cjs install --immutable
+node .yarn/releases/yarn-4.18.1.cjs test
+node .yarn/releases/yarn-4.18.1.cjs typecheck
+node .yarn/releases/yarn-4.18.1.cjs check:sdk
+node .yarn/releases/yarn-4.18.1.cjs doctor
+node .yarn/releases/yarn-4.18.1.cjs check:native
+cd ../functions
+node .yarn/releases/yarn-4.18.1.cjs install --immutable
+node .yarn/releases/yarn-4.18.1.cjs test
+node .yarn/releases/yarn-4.18.1.cjs check:firestore
+node .yarn/releases/yarn-4.18.1.cjs test:firestore
+cd ../tooling
+node .yarn/releases/yarn-4.18.1.cjs install --immutable
+node .yarn/releases/yarn-4.18.1.cjs test
+```
 
-Debug native builds populate the CloudKit development schema when the store loads. Use an iCloud-signed-in device or simulator, then deploy the schema in CloudKit Console before TestFlight. See [release gates](release.md) for signing and production checks. A local schema initialization failure does not block recording lifts.
+The Firestore integration check requires Java 21 or newer and uses only a loopback demo project; CI installs Java 21. It verifies real Admin 14 transactions, timestamps, cached responses, quota accounting and request fingerprint rejection.
 
-The callable pins Jev `jev-1.13.0` through TypeSafe's HTTP API. The iOS Metro export and TypeScript check validate JavaScript; a device build is needed for native storage, App Check, and iCloud.
+The vendored runtime works even if a globally installed `yarn` is still Classic. For normal `yarn` commands, use Corepack. Do not generate npm lockfiles. Install scripts are disabled by Yarn's current default; the checked native and JS builds work without globally enabling dependency scripts. All three projects explicitly retain the 1,440-minute package release-age gate.
 
-Node 22 is a [supported Firebase runtime](https://firebase.google.com/docs/functions/manage-functions). Node 20 was deprecated on April 30, 2026 and is scheduled for decommissioning on October 30, 2026; see [Google runtime support](https://docs.cloud.google.com/functions/docs/runtime-support).
+From the repository root, `node scripts/check-dependency-audit.cjs frontend` (or `functions` / `tooling`) writes complete recursive full and production audit reports. New findings and any critical finding fail the check; existing exact findings remain visible and have replacement plans in the migration report. CI runs immutable installs and the same regression checks.
+
+## App and native builds
+
+Provide `frontend/GoogleService-Info.plist`, or set `GOOGLE_SERVICES_PLIST` to an EAS file environment variable path. The existing bundle is `com.blackmaskexe.gainschat`, team `T296YJXC87`, private container `iCloud.com.blackmaskexe.gainschat`. Enable Anonymous Auth and register App Attest for the iOS Firebase app. Development builds use a registered App Check debug token. Production uses App Attest, and Auth/callables wait for a valid token.
+
+In `frontend/`, run `yarn expo prebuild --clean --platform ios --no-install`, then `pod install` in `ios/`, and `yarn ios`. Generated native projects remain ignored; plugins and the local module are the source of truth. Never reset stores or redeploy CloudKit schema merely to upgrade dependencies. `yarn check:native` generates disposable native projects and verifies both Firebase plugin orders without real credentials.
+
+Run `yarn start --localhost` for a development client. Keep Metro on loopback. `yarn expo export --platform ios --output-dir /tmp/gainschat-export` validates production bundling. From `frontend/`, `yarn eas ...` uses the CLI installed in the sibling tooling project. EAS builds require that tooling install first.
+
+SDK 58 starts React in SceneDelegate. RNFirebase 26's native plugins do not recognize that template, so the final local plugin inserts one App Check initialization, one Firebase configuration and remote-notification registration before AppDelegate returns. Keep the bridging header generated by RNFirebase. Both plugin order integrations and native compilation cover this adapter.
+
+## Backend checks
+
+Only `TYPESAFE_API_KEY` and `GEMINI_API_KEY` are bound to message processing. Set them through Firebase Secret Manager; no database password or JWT secret is needed. `yarn check:firestore` validates referenced files and index/TTL configuration locally; it does not compile rules or deploy them.
+
+From the repository root, `node scripts/check-functions-package.cjs` copies only deployable source, installs immutably, prunes dev dependencies and generates the Firebase endpoint manifest. It leaves an isolated temporary tree for inspection. Never upload its node_modules or Yarn cache. The Functions Framework is explicitly pinned so the cloud build does not inject an outdated npm-managed framework layer.
+
+`node scripts/check-live-providers.cjs` makes one billable synthetic call to each existing provider, reading project secrets only into memory. It prints availability and timing, never keys or response text, and does not write Firestore or workouts. This is an operator check, not a CI test.
+
+The one-time `scripts/renew-ios-signing.cjs` helper intentionally requires the old audited global EAS CLI and old credential state. Signing recovery already completed; do not update its assertions or rerun generation as part of dependency upgrades.

@@ -1,25 +1,43 @@
 {
   "cli": {
-    "version": ">= 16.1.0",
+    "version": "25.2.0",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "24.21.0",
+      "corepack": true,
+      "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.0"
+      }
     },
     "simulator": {
       "developmentClient": true,
       "environment": "development",
       "ios": {
-        "simulator": true
-      }
+        "simulator": true,
+        "image": "macos-tahoe-26.6-xcode-27.0"
+      },
+      "node": "24.21.0",
+      "corepack": true
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "24.21.0",
+      "corepack": true,
+      "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.0"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "node": "24.21.0",
+      "corepack": true,
+      "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.0"
+      }
     }
   },
   "submit": {

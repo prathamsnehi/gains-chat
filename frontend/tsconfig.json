@@ -6,7 +6,8 @@
     "paths": {
       "@/*": ["./*"],
       "@/assets/*": ["./assets/*"]
-    }
+    },
+    "types": ["react", "react-native", "node"]
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

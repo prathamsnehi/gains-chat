@@ -4,15 +4,30 @@ const { GoogleGenAI } = require("@google/genai");
 const { validateMessageInput, routeMessage } = require("./messageLogic");
 const { classifyWithJev } = require("./jev");
 const { chargeMessage } = require("./limits");
+const {
+  runProvider,
+  PROVIDER_BUDGET_MS,
+  JEV_TIMEOUT_MS,
+  GEMINI_TIMEOUT_MS,
+} = require("./providerBudget");
 
 let gemini;
 let firstInvocation = true;
 function geminiClient(apiKey) {
-  if (!gemini) gemini = new GoogleGenAI({ apiKey });
+  if (!gemini)
+    gemini = new GoogleGenAI({
+      apiKey,
+      httpOptions: { retryOptions: { attempts: 1 } },
+    });
   return gemini;
 }
 
-async function chatReply(input, apiKey, historyMode) {
+async function chatReply(
+  input,
+  apiKey,
+  historyMode,
+  { signal, timeoutMs = GEMINI_TIMEOUT_MS } = {},
+) {
   const snippets = input.historySnippets
     .map(
       (x) =>
@@ -44,7 +59,12 @@ async function chatReply(input, apiKey, historyMode) {
   const response = await geminiClient(apiKey).models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
-    config: { maxOutputTokens: 180, temperature: 0.65 },
+    config: {
+      maxOutputTokens: 180,
+      temperature: 0.65,
+      abortSignal: signal,
+      httpOptions: { timeout: timeoutMs, retryOptions: { attempts: 1 } },
+    },
   });
   return typeof response.text === "string" && response.text.trim()
     ? response.text.trim().slice(0, 900)
@@ -58,8 +78,11 @@ async function processMessageCore({
   jevKey,
   geminiKey,
   logger = console,
+  providers = { classify: classifyWithJev, reply: chatReply },
+  now = Date.now,
 }) {
-  const started = Date.now();
+  const started = now();
+  const deadline = started + PROVIDER_BUDGET_MS;
   const coldStart = firstInvocation;
   firstInvocation = false;
   const input = validateMessageInput(data);
@@ -76,7 +99,12 @@ async function processMessageCore({
     .doc(uid + "_" + input.requestId);
   try {
     const classifiedAt = Date.now();
-    const answers = await classifyWithJev(input, jevKey);
+    const answers = await runProvider(
+      deadline,
+      JEV_TIMEOUT_MS,
+      (options) => providers.classify(input, jevKey, options),
+      now,
+    );
     const jevMs = Date.now() - classifiedAt;
     const decision = routeMessage(input, answers);
     let result = decision;
@@ -86,10 +114,17 @@ async function processMessageCore({
       decision.kind === "history_answer_needed"
     ) {
       const geminiAt = Date.now();
-      const message = await chatReply(
-        input,
-        geminiKey,
-        decision.kind === "history_answer_needed",
+      const message = await runProvider(
+        deadline,
+        GEMINI_TIMEOUT_MS,
+        (options) =>
+          providers.reply(
+            input,
+            geminiKey,
+            decision.kind === "history_answer_needed",
+            options,
+          ),
+        now,
       );
       geminiMs = Date.now() - geminiAt;
       result = { kind: "chat_reply", message };

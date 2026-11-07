@@ -1,20 +1,15 @@
 # Architecture
 
-The iPhone owns workout records. `frontend/modules/gains-local-store` stores lifts, exercises, aliases, and goals in Core Data mirrored through `NSPersistentCloudKitContainer` to the user's private iCloud database. Recent chat and the pending queue use a separate local Core Data store. Firebase keeps anonymous identity and rate limit documents; it does not store workout history.
+The iPhone owns workout records. The custom Expo module stores lifts, exercises, aliases and goals in Core Data mirrored through NSPersistentCloudKitContainer to the user's private iCloud database. Chat and the pending queue use a separate local Core Data store. The programmatic model and store identities remain unchanged during the dependency migration.
 
-```mermaid
-flowchart LR
-  UI[Today, History, Progress, Goals] --> Store[Local Core Data]
-  Store <--> Cloud[Private CloudKit]
-  UI --> Queue[Local pending queue]
-  Queue --> Callable[Firebase processMessage]
-  Callable --> Jev[Jev intent and exercise choice]
-  Callable --> Gemini[Gemini conversation]
-  Callable --> Limits[Firestore limits]
-  Callable --> Queue
-  Queue --> Store
-```
+The five file-based Expo Router tabs are Today, History, Progress, Goals and Settings. Root layout initialization gates all routes until local storage opens. Firebase initialization is lazy so local screens and manual logging remain available offline.
 
-`frontend/services/bridge.ts` loads a snapshot, publishes it to screens, and drains pending messages in timestamp order. It creates a user message and queue item before networking. A stable request ID and local record check prevent retries from adding a second lift. The callable returns a draft; only the phone writes the final record. For a history question, the phone retrieves a few relevant lifts and sends those snippets for an answer.
+A message is saved locally before networking. The durable queue freezes its complete wire request before sending; request IDs always refer to that same payload. After successful processing the queue rereads storage, including messages enqueued while a request was in flight. A failure preserves the current request and phase and stops at the queue head until a later retry.
 
-The old HTTP API remains temporarily for transition. Its user routes trust a caller supplied user ID. They must not be used by the new client and must be retired after import verification. See [migration](migration.md).
+The Firebase `processMessage` callable requires Auth and App Check. Jev selects intent, exercise and number roles; server code parses numbers from the original message. Gemini generates conversation or answers from phone-supplied history snippets. Only the phone writes the final workout. History follow-up has its own persisted request ID, payload and phase so a restart does not regenerate the follow-up or revert to its first request.
+
+Firestore stores quota counters and temporary idempotency results, not durable workout history. Hourly and daily identity quotas use `messageLimits`; global daily quotas retain `aiRateLimits` and its scheduled cleanup. A failed provider attempt remains charged but its request marker is removed for retry. Completed responses replay without another provider call or charge.
+
+The `api` HTTP function serves self-contained HTML at the existing `/privacy-policy` path and returns HTTP 410 for former routes. Legacy authentication, MongoDB models, exports, JSON restore and migration code are removed. Release instructions explicitly remove the already deployed export callable; deleting source alone does not retire it in production.
+
+Foregrounding refreshes the local snapshot even when the queue is empty. Native CloudKit events currently update sync status internally without emitting JS record-change events, so a remote change arriving while a screen stays active may require refocusing a tab. This is a recorded existing limitation, not a claim of continuously refreshed CloudKit UI.

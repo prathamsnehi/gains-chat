@@ -1,20 +1,13 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router/js-tabs";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { useColorScheme } from "react-native";
-import TodayScreen from "../screens/TodayScreen";
-import HistoryScreen from "../screens/HistoryScreen";
-import ProgressScreen from "../screens/ProgressScreen";
-import GoalsScreen from "../screens/GoalsScreen";
-import SettingsScreen from "../screens/SettingsScreen";
 import { colorsFor } from "../theme/palette";
 
-const Tab = createBottomTabNavigator();
 export default function BottomTabsNavigation() {
   const c = colorsFor(useColorScheme() === "dark");
   return (
-    <Tab.Navigator
-      initialRouteName="Today"
+    <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: c.accent,
@@ -32,11 +25,11 @@ export default function BottomTabsNavigation() {
             string,
             React.ComponentProps<typeof Ionicons>["name"]
           > = {
-            Today: "chatbubble-ellipses",
-            History: "time",
-            Progress: "trending-up",
-            Goals: "flag",
-            Settings: "settings-outline",
+            index: "chatbubble-ellipses",
+            history: "time",
+            progress: "trending-up",
+            goals: "flag",
+            settings: "settings-outline",
           };
           return (
             <Ionicons
@@ -48,11 +41,11 @@ export default function BottomTabsNavigation() {
         },
       })}
     >
-      <Tab.Screen name="Today" component={TodayScreen} />
-      <Tab.Screen name="History" component={HistoryScreen} />
-      <Tab.Screen name="Progress" component={ProgressScreen} />
-      <Tab.Screen name="Goals" component={GoalsScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-    </Tab.Navigator>
+      <Tabs.Screen name="index" options={{ title: "Today" }} />
+      <Tabs.Screen name="history" options={{ title: "History" }} />
+      <Tabs.Screen name="progress" options={{ title: "Progress" }} />
+      <Tabs.Screen name="goals" options={{ title: "Goals" }} />
+      <Tabs.Screen name="settings" options={{ title: "Settings" }} />
+    </Tabs>
   );
 }

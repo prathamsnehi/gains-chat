@@ -1,7 +1,7 @@
-const admin = require("firebase-admin");
+const { getFirestore } = require("firebase-admin/firestore");
 
 const cleanupExpiredRateLimits = async () => {
-  const db = admin.firestore();
+  const db = getFirestore();
   const now = new Date();
 
   try {
@@ -19,7 +19,7 @@ const cleanupExpiredRateLimits = async () => {
     if (expiredDocs.docs.length > 0) {
       await batch.commit();
       console.log(
-        `Cleaned up ${expiredDocs.docs.length} expired rate limit documents`
+        `Cleaned up ${expiredDocs.docs.length} expired rate limit documents`,
       );
     }
   } catch (error) {

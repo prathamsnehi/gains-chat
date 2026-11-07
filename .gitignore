@@ -47,6 +47,11 @@ build/Release
 
 # Dependency directories
 node_modules/
+**/.yarn/*
+!**/.yarn/releases/
+!**/.yarn/patches/
+audit-*.jsonl
+frontend/dist/
 
 # Optional npm cache directory
 .npm

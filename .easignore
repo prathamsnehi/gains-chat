@@ -10,6 +10,7 @@ firebase-debug.*.log*
 
 # Firebase cache
 .firebase/
+.git/
 
 # Firebase config
 
@@ -47,6 +48,12 @@ build/Release
 
 # Dependency directories
 node_modules/
+**/.yarn/cache/
+**/.yarn/unplugged/
+**/.yarn/install-state.gz
+**/.yarn/build-state.yml
+audit-*.jsonl
+frontend/dist/
 
 # Optional npm cache directory
 .npm

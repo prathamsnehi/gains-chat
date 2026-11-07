@@ -1,0 +1,133 @@
+{
+  "frontend": {
+    "full": [
+      {
+        "package": "braces",
+        "id": "1240992",
+        "severity": "high",
+        "versions": ["3.0.3"]
+      },
+      {
+        "package": "node-forge",
+        "id": "1240912",
+        "severity": "high",
+        "versions": ["1.4.0"]
+      }
+    ],
+    "production": [
+      {
+        "package": "braces",
+        "id": "1240992",
+        "severity": "high",
+        "versions": ["3.0.3"]
+      },
+      {
+        "package": "node-forge",
+        "id": "1240912",
+        "severity": "high",
+        "versions": ["1.4.0"]
+      }
+    ]
+  },
+  "functions": {
+    "full": [
+      {
+        "package": "@opentelemetry/core",
+        "id": "1153174",
+        "severity": "moderate",
+        "versions": ["1.30.1"]
+      },
+      {
+        "package": "braces",
+        "id": "1240992",
+        "severity": "high",
+        "versions": ["3.0.3"]
+      },
+      {
+        "package": "glob",
+        "id": "glob (deprecation)",
+        "severity": "moderate",
+        "versions": ["10.5.0"]
+      },
+      {
+        "package": "json-ptr",
+        "id": "json-ptr (deprecation)",
+        "severity": "moderate",
+        "versions": ["3.1.1"]
+      },
+      {
+        "package": "node-domexception",
+        "id": "node-domexception (deprecation)",
+        "severity": "moderate",
+        "versions": ["1.0.0"]
+      }
+    ],
+    "production": [
+      {
+        "package": "glob",
+        "id": "glob (deprecation)",
+        "severity": "moderate",
+        "versions": ["10.5.0"]
+      },
+      {
+        "package": "node-domexception",
+        "id": "node-domexception (deprecation)",
+        "severity": "moderate",
+        "versions": ["1.0.0"]
+      }
+    ]
+  },
+  "tooling": {
+    "full": [
+      {
+        "package": "braces",
+        "id": "1240992",
+        "severity": "high",
+        "versions": ["3.0.3"]
+      },
+      {
+        "package": "diff",
+        "id": "1112706",
+        "severity": "low",
+        "versions": ["7.0.0"]
+      },
+      {
+        "package": "glob",
+        "id": "glob (deprecation)",
+        "severity": "moderate",
+        "versions": ["6.0.4"]
+      },
+      {
+        "package": "inflight",
+        "id": "inflight (deprecation)",
+        "severity": "moderate",
+        "versions": ["1.0.6"]
+      },
+      {
+        "package": "node-forge",
+        "id": "1240912",
+        "severity": "high",
+        "versions": ["1.4.0"]
+      },
+      {
+        "package": "rimraf",
+        "id": "rimraf (deprecation)",
+        "severity": "moderate",
+        "versions": ["2.4.5"]
+      },
+      {
+        "package": "sprintf-js",
+        "id": "1241202",
+        "severity": "moderate",
+        "versions": ["1.0.3"]
+      },
+      {
+        "package": "ts-deepmerge",
+        "id": "1121318",
+        "severity": "moderate",
+        "versions": ["6.2.0"]
+      }
+    ],
+    "production": []
+  }
+}

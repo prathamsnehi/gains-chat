@@ -24,10 +24,6 @@ public class GainsLocalStoreModule: Module {
       try self.store.remove(kind: kind, id: id)
     }
 
-    AsyncFunction("importRecords") { (records: [[String: String]]) throws -> [String: Int] in
-      try self.store.importRecords(records)
-    }
-
     AsyncFunction("clearAll") { () throws in
       try self.store.clearAll()
     }
@@ -230,38 +226,6 @@ private final class GainsStore {
       } catch { caught = error }
     }
     if let caught = caught { throw caught }
-  }
-
-  func importRecords(_ records: [[String: String]]) throws -> [String: Int] {
-    let context = try context()
-    var inserted = 0
-    var skipped = 0
-    var caught: Error?
-    context.performAndWait {
-      do {
-        for record in records {
-          guard let kind = record["kind"], let id = record["id"], !id.isEmpty,
-                let payload = record["payload"], !payload.isEmpty else { throw StoreError.invalidRecord }
-          let entity = try self.entityName(kind)
-          if try self.existing(context, entity: entity, kind: kind, id: id) != nil {
-            skipped += 1
-            continue
-          }
-          let object = NSEntityDescription.insertNewObject(forEntityName: entity, into: context)
-          object.setValue(id, forKey: "id")
-          object.setValue(kind, forKey: "kind")
-          object.setValue(payload, forKey: "payload")
-          object.setValue(record["updatedAt"] ?? "", forKey: "updatedAt")
-          inserted += 1
-        }
-        try context.save()
-      } catch {
-        context.rollback()
-        caught = error
-      }
-    }
-    if let caught = caught { throw caught }
-    return ["inserted": inserted, "skipped": skipped]
   }
 
   func clearAll() throws {

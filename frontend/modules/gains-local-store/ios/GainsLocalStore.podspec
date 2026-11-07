@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.author         = 'Gains Chat'
   s.homepage       = 'https://github.com/prathamsnehi/gainschat-firebase'
   s.license        = { :type => 'Proprietary', :text => 'Internal application module.' }
-  s.platforms      = { :ios => '15.1' }
+  s.platforms      = { :ios => '16.4' }
   s.source         = { :git => 'https://github.com/prathamsnehi/gainschat-firebase.git' }
   s.static_framework = true
   s.dependency 'ExpoModulesCore'

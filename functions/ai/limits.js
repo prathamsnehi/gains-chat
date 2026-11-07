@@ -18,7 +18,7 @@ async function chargeMessage(db, uid, input, now = new Date()) {
     request: db.collection("messageRequests").doc(uid + "_" + input.requestId),
     hourly: db.collection("messageLimits").doc("hour_" + uid + "_" + hour),
     daily: db.collection("messageLimits").doc("day_" + uid + "_" + day),
-    // Share the legacy service counter while both backends coexist.
+    // Retained service-wide counter; cleanupRateLimits expires these documents.
     global: db.collection("aiRateLimits").doc("global_daily_" + day),
   };
   return db.runTransaction(async (transaction) => {
@@ -74,55 +74,4 @@ async function chargeMessage(db, uid, input, now = new Date()) {
   });
 }
 
-async function chargeLegacyExport(db, uid, emailKey, now = new Date()) {
-  const hour = now.toISOString().slice(0, 13);
-  const day = now.toISOString().slice(0, 10);
-  const refs = [
-    {
-      ref: db
-        .collection("legacyExportLimits")
-        .doc("hour_uid_" + uid + "_" + hour),
-      limit: 5,
-      ttl: 2 * 3600_000,
-    },
-    {
-      ref: db
-        .collection("legacyExportLimits")
-        .doc("day_uid_" + uid + "_" + day),
-      limit: 20,
-      ttl: 2 * 24 * 3600_000,
-    },
-    {
-      ref: db
-        .collection("legacyExportLimits")
-        .doc("hour_email_" + emailKey + "_" + hour),
-      limit: 5,
-      ttl: 2 * 3600_000,
-    },
-    {
-      ref: db
-        .collection("legacyExportLimits")
-        .doc("day_email_" + emailKey + "_" + day),
-      limit: 20,
-      ttl: 2 * 24 * 3600_000,
-    },
-  ];
-  await db.runTransaction(async (transaction) => {
-    const docs = await Promise.all(refs.map(({ ref }) => transaction.get(ref)));
-    if (
-      docs.some((doc, index) => (doc.data()?.count || 0) >= refs[index].limit)
-    )
-      throw new HttpsError(
-        "resource-exhausted",
-        "Too many import attempts. Try again later.",
-      );
-    refs.forEach(({ ref, ttl }, index) =>
-      transaction.set(ref, {
-        count: (docs[index].data()?.count || 0) + 1,
-        expiresAt: new Date(now.getTime() + ttl),
-      }),
-    );
-  });
-}
-
-module.exports = { LIMITS, chargeMessage, chargeLegacyExport, fingerprint };
+module.exports = { LIMITS, chargeMessage, fingerprint };

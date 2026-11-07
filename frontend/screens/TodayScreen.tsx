@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { useFocusEffect } from "expo-router";
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
+  type ScrollViewInstance,
   Text,
   TextInput,
   View,
@@ -25,7 +26,7 @@ export default function TodayScreen() {
     exerciseId?: string;
   } | null>(null);
   const [sending, setSending] = useState(false);
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<ScrollViewInstance>(null);
   const seenMessages = useRef<number | null>(null);
   useFocusEffect(
     useCallback(() => {

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { useFocusEffect } from "expo-router";
 import {
   Alert,
   Modal,

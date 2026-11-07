@@ -1,15 +1,14 @@
 # Gains Chat
 
-Gains Chat is an iPhone lifting log. It opens to a chat composer, likely exercises for today, and each exercise's last set. Messages appear immediately while offline; a durable queue processes them when the phone reconnects. History has editing and search, Progress has PRs and estimated one rep max trends, and Goals remains a secondary view.
+Gains Chat is an iPhone lifting log with a chat composer, manual workout editing, History, Progress and Goals. Core Data saves workouts locally; private CloudKit mirrors lifts, exercises, aliases and goals. Chat and the durable pending queue stay on the phone.
 
-## Repository
+- `frontend/`: Expo SDK 58, React Native 0.88, React 19.3, Expo Router and the custom Swift storage module.
+- `functions/`: authenticated, App Check protected message processing on Firebase Functions / Node 24, quota cleanup and the existing privacy-policy URL.
+- `tooling/`: separately pinned EAS CLI and its security compatibility checks.
+- `docs/`: [development](docs/development.md), [architecture](docs/architecture.md), [dependency migration and security follow-ups](docs/dependency-migration.md), and [release acceptance](docs/release.md).
 
-- `frontend/` — Expo iOS app and local Swift storage module.
-- `functions/` — Firebase callable message service, legacy import endpoint, and temporary legacy HTTP service.
-- `docs/` — architecture, data, AI, migration, development, and release procedures.
+Each package directory is an independent Yarn 4.18.1 project with a committed lockfile and vendored runtime. Use Node 24.21.0, then run `node .yarn/releases/yarn-4.18.1.cjs install --immutable` inside each directory. Corepack-enabled Yarn can also run the same commands.
 
-Start with [development setup](docs/development.md) and [architecture](docs/architecture.md). The workout-only restore is described in [migration](docs/migration.md). Keep the legacy service until the preserved recent workouts have been checked on the iPhone.
+Legacy accounts, HTTP workout routes, import/migration tools and JSON workout restore have been retired from this source. Existing modern Core Data / CloudKit records are preserved. Production removal of the old callable and replacement of the HTTP service remain explicit release actions.
 
-## Verification
-
-TypeScript, an iOS Metro export, restore and migration mapping tests, backend tests, a [remote iOS simulator build](https://expo.dev/accounts/blackmaskexe/projects/gains-chat/builds/3e45094e-8fd1-43f2-a1b0-a9a33a6f4855), and an App Store distribution build pass. The signed archive's production CloudKit, App Attest, and APNs entitlements were verified. The iCloud-signed-in simulator opens the app, reports iCloud available, and successfully initializes the development schema. The production schema is deployed and version **2.0.0 (20)** is accepted for internal TestFlight testing; see [release status](docs/release.md). App Check on the iPhone, CloudKit recovery, live Jev/Gemini timings, and workout restoration still require device verification. The warm two-second median is a target, not a measured result.
+The SDK 58 native simulator Release build, JavaScript bundle and regression tests pass locally. The current migration has not been deployed or submitted. Signed-iPhone App Attest and CloudKit recovery remain release acceptance checks; earlier TestFlight build 2.0.0 (20) is the previous release, not this migration.

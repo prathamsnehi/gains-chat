@@ -18,7 +18,7 @@ vm.runInNewContext(fs.readFileSync(require.resolve("./limits"), "utf8"), {
   JSON,
   Promise,
 });
-const { chargeMessage, chargeLegacyExport } = moduleObject.exports;
+const { chargeMessage } = moduleObject.exports;
 
 function database() {
   const docs = new Map();
@@ -95,16 +95,6 @@ test("hourly and global quotas fail closed", async () => {
   db.docs.set("aiRateLimits/global_daily_2026-10-03", { count: 1000 });
   await assert.rejects(
     chargeMessage(db, "user1", message, fixedDate),
-    (error) => error.code === "resource-exhausted",
-  );
-});
-
-test("legacy export throttles by email across anonymous identities", async () => {
-  const db = database();
-  for (let n = 0; n < 5; n++)
-    await chargeLegacyExport(db, "user" + n, "emailhash", fixedDate);
-  await assert.rejects(
-    chargeLegacyExport(db, "new-user", "emailhash", fixedDate),
     (error) => error.code === "resource-exhausted",
   );
 });

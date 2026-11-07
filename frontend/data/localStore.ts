@@ -1,11 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
 import NativeStore, { type RecordKind } from "../modules/gains-local-store/src";
 import { BUILTIN_EXERCISES } from "./catalog";
-import {
-  legacyDeviceOwner,
-  prepareLegacyDeviceData,
-} from "./deviceStorageMigration";
+import type { ProcessMessageRequest } from "./aiClient";
 
 export type WeightUnit = "lb" | "kg";
 
@@ -20,7 +15,6 @@ export interface Lift {
   createdAt?: string;
   updatedAt?: string;
   requestId?: string;
-  legacyId?: string;
 }
 
 export interface Exercise {
@@ -29,7 +23,6 @@ export interface Exercise {
   aliases?: string[];
   group?: string;
   isCustom?: boolean;
-  legacyId?: string;
 }
 
 export interface Alias {
@@ -68,6 +61,8 @@ export interface PendingMessage {
   attemptCount?: number;
   lastError?: string;
   selectedExerciseId?: string;
+  phase?: "message" | "history";
+  request?: ProcessMessageRequest;
 }
 
 export interface Snapshot {
@@ -77,14 +72,6 @@ export interface Snapshot {
   goals: Goal[];
   messages: ChatMessage[];
   pending: PendingMessage[];
-}
-
-export interface LegacyImport {
-  lifts?: Lift[];
-  exercises?: Exercise[];
-  aliases?: Alias[];
-  goals?: Goal[];
-  chatMessages?: ChatMessage[];
 }
 
 const updatedAt = (value: { updatedAt?: string; createdAt?: string }): string =>
@@ -241,100 +228,4 @@ export const localStore = {
 
   getSyncStatus: () => NativeStore.getSyncStatus(),
   clearAllData: () => NativeStore.clearAll(),
-
-  async importLegacy(
-    data: LegacyImport,
-  ): Promise<{ inserted: number; skipped: number }> {
-    const records: Array<{
-      id: string;
-      kind: RecordKind;
-      payload: string;
-      updatedAt: string;
-    }> = [];
-    const append = <
-      T extends { id: string; updatedAt?: string; createdAt?: string },
-    >(
-      kind: RecordKind,
-      values: T[] = [],
-    ) => {
-      for (const value of values) {
-        if (!value.id)
-          throw new Error(`Legacy ${kind} record is missing a stable id`);
-        if (kind === "lift") validateLift(value as unknown as Lift);
-        records.push({
-          kind,
-          id: value.id,
-          payload: JSON.stringify(value),
-          updatedAt: updatedAt(value),
-        });
-      }
-    };
-    append("lift", data.lifts);
-    append("exercise", data.exercises);
-    append("alias", data.aliases);
-    append("goal", data.goals);
-    append("chat", data.chatMessages);
-    return NativeStore.importRecords(records);
-  },
-
-  /** Runs once from the in-place update using only the owner ID already on this phone. */
-  async migratePreviousDeviceStorage(): Promise<{
-    state: "imported" | "partial" | "skipped";
-    inserted: number;
-    skipped: number;
-    warnings: string[];
-  }> {
-    try {
-      const owner = legacyDeviceOwner(
-        await SecureStore.getItemAsync("userData"),
-      );
-      if (!owner)
-        return { state: "skipped", inserted: 0, skipped: 0, warnings: [] };
-      const result = await this.importLegacyDeviceStorage(owner);
-      return {
-        ...result,
-        state: result.warnings.length ? "partial" : "imported",
-      };
-    } catch {
-      // A locked Keychain or malformed old data must never prevent opening the local app.
-      return {
-        state: "skipped",
-        inserted: 0,
-        skipped: 0,
-        warnings: [
-          "Previous phone data could not be imported; original storage was kept. Try reopening the app after unlocking the iPhone.",
-        ],
-      };
-    }
-  },
-
-  /** Imports old on-device goals/chat without exporting an account or erasing their keys. */
-  async importLegacyDeviceStorage(
-    ownerId: string,
-  ): Promise<{ inserted: number; skipped: number; warnings: string[] }> {
-    if (!ownerId) throw new Error("Previous device owner ID is required");
-    const markerKey = `gainsChat.legacyDeviceImport.${ownerId}.workoutRestore.v1`;
-    const [marker, ownerRaw, goalsRaw, messagesRaw, existingExercises] =
-      await Promise.all([
-        AsyncStorage.getItem(markerKey),
-        SecureStore.getItemAsync("userData"),
-        AsyncStorage.getItem("exerciseGoals"),
-        AsyncStorage.getItem("logMessages"),
-        this.listExercises(),
-      ]);
-    if (legacyDeviceOwner(ownerRaw) !== ownerId)
-      throw new Error("Previous phone data belongs to a different account");
-    if (marker === "complete") return { inserted: 0, skipped: 0, warnings: [] };
-    const prepared = prepareLegacyDeviceData(
-      ownerId,
-      goalsRaw,
-      messagesRaw,
-      existingExercises,
-      new Date().toISOString(),
-    );
-    const result = await this.importLegacy(prepared.data);
-    if (!prepared.warnings.length)
-      await AsyncStorage.setItem(markerKey, "complete");
-    return { ...result, warnings: prepared.warnings };
-  },
 };
