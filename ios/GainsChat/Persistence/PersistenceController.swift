@@ -6,6 +6,10 @@ private final class LoadResult: @unchecked Sendable {
     var succeeded = true
 }
 
+enum StoreError: Error {
+    case unreadableValue
+}
+
 final class PersistenceController {
     static let cloudContainerIdentifier = "iCloud.com.blackmaskexe.gainschat"
     let container: NSPersistentCloudKitContainer
@@ -54,48 +58,61 @@ final class PersistenceController {
         return rows.compactMap(Self.message).sorted { $0.createdAt < $1.createdAt }
     }
 
-    func save(exercise: KnownExercise) {
+    func save(exercise: KnownExercise) throws {
         let context = container.viewContext
         let object = existing("Exercise", id: exercise.id) ?? NSEntityDescription.insertNewObject(forEntityName: "Exercise", into: context)
         object.setValue(exercise.id, forKey: "id")
         object.setValue(exercise.name, forKey: "name")
         object.setValue(exercise.aliases.joined(separator: "\n"), forKey: "aliases")
         object.setValue(Date(), forKey: "updatedAt")
-        try? context.save()
+        try commit()
     }
 
-    func save(lift: LiftRecord) {
+    func save(lift: LiftRecord) throws {
+        guard lift.weight.isFinite, lift.weight > 0, let reps = Int16(exactly: lift.reps), reps > 0 else {
+            throw StoreError.unreadableValue
+        }
         let context = container.viewContext
         let object = existing("Lift", id: lift.id) ?? NSEntityDescription.insertNewObject(forEntityName: "Lift", into: context)
         object.setValue(lift.id, forKey: "id")
         object.setValue(lift.exerciseID, forKey: "exerciseID")
         object.setValue(lift.exerciseName, forKey: "exerciseName")
         object.setValue(lift.weight, forKey: "weight")
-        object.setValue(Int16(lift.reps), forKey: "reps")
+        object.setValue(reps, forKey: "reps")
         object.setValue(lift.unit.rawValue, forKey: "unit")
         object.setValue(lift.performedAt, forKey: "performedAt")
-        try? context.save()
+        try commit()
     }
 
-    func deleteLift(id: String) {
+    func deleteLift(id: String) throws {
         if let object = existing("Lift", id: id) {
             container.viewContext.delete(object)
-            try? container.viewContext.save()
+            try commit()
         }
     }
 
-    func save(message: ChatMessage) {
+    func save(message: ChatMessage) throws {
         let context = container.viewContext
         let object = existing("ChatLine", id: message.id) ?? NSEntityDescription.insertNewObject(forEntityName: "ChatLine", into: context)
         object.setValue(message.id, forKey: "id")
         object.setValue(message.role.rawValue, forKey: "role")
         object.setValue(message.text, forKey: "text")
         object.setValue(message.createdAt, forKey: "createdAt")
-        try? context.save()
+        try commit()
     }
 
-    func replace(message: ChatMessage) {
-        save(message: message)
+    private func commit() throws {
+        let context = container.viewContext
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            throw error
+        }
+    }
+
+    func replace(message: ChatMessage) throws {
+        try save(message: message)
     }
 
     private func existing(_ entity: String, id: String) -> NSManagedObject? {

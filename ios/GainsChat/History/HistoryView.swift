@@ -58,7 +58,7 @@ struct HistoryView: View {
 
     private func delete(_ lifts: [LiftRecord], at offsets: IndexSet) {
         for index in offsets {
-            training.delete(lifts[index])
+            try? training.delete(lifts[index])
         }
     }
 }

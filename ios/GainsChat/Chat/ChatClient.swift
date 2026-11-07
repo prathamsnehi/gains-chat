@@ -1,9 +1,10 @@
 import Foundation
 import GainsCore
 
+@MainActor
 struct ChatClient {
     var endpoint: URL
-    var token: () async throws -> String
+    var token: @MainActor () async throws -> String
     var session: URLSession = .shared
 
     static func live() -> ChatClient {

@@ -37,8 +37,12 @@ final class ChatStore: ObservableObject {
         )
         switch route {
         case .log(let command):
-            _ = training.apply(command)
-            append(role: .assistant, text: LogConfirmation.text(for: command))
+            do {
+                _ = try training.apply(command)
+                append(role: .assistant, text: LogConfirmation.text(for: command))
+            } catch {
+                append(role: .assistant, text: "That set could not be saved on this iPhone.")
+            }
         case .clarify(let message):
             append(role: .assistant, text: message)
         case .question(_, let snippets):
@@ -64,7 +68,7 @@ final class ChatStore: ObservableObject {
     private func append(role: ChatMessage.Role, text: String) -> ChatMessage {
         let message = ChatMessage(id: UUID().uuidString, role: role, text: text, createdAt: Date())
         messages.append(message)
-        persistence.save(message: message)
+        try? persistence.save(message: message)
         return message
     }
 
@@ -73,6 +77,6 @@ final class ChatStore: ObservableObject {
         var updated = messages[index]
         updated.text = text
         messages[index] = updated
-        persistence.replace(message: updated)
+        try? persistence.replace(message: updated)
     }
 }

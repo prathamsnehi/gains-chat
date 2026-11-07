@@ -9,15 +9,17 @@ struct SyncStatusButton: View {
             Label("iCloud", systemImage: "icloud")
         }
         .frame(minWidth: AppMetrics.minimumTap, minHeight: AppMetrics.minimumTap)
-            .alert("iCloud", isPresented: $isShowingStatus) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(training.syncSummary)
-            }
+        .alert("iCloud", isPresented: $isShowingStatus) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(training.syncSummary)
+        }
     }
 
     private func showStatus() {
-        training.refreshSyncStatus()
-        isShowingStatus = true
+        Task {
+            await training.refreshSyncStatus()
+            isShowingStatus = true
+        }
     }
 }

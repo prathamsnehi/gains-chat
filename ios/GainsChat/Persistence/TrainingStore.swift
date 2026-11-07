@@ -16,7 +16,7 @@ final class TrainingStore: ObservableObject {
         self.defaults = defaults
         reload()
         importLegacyIfNeeded()
-        refreshSyncStatus()
+        Task { await refreshSyncStatus() }
     }
 
     func reload() {
@@ -25,22 +25,13 @@ final class TrainingStore: ObservableObject {
         lifts = library.lifts
     }
 
-    func apply(_ command: LogCommand) -> LiftRecord {
-        let exerciseID: String
-        if let existing = command.exerciseID {
-            exerciseID = existing
-            let current = exercises.first { $0.id == existing }
-            let exercise = KnownExercise(id: existing, name: command.name, aliases: command.aliases)
-            persistence.save(exercise: exercise)
-            if current == nil {
-                exercises.append(exercise)
-            } else {
-                exercises = exercises.map { $0.id == existing ? exercise : $0 }
-            }
+    func apply(_ command: LogCommand) throws -> LiftRecord {
+        let exerciseID = command.exerciseID ?? UUID().uuidString
+        let exercise = KnownExercise(id: exerciseID, name: command.name, aliases: command.aliases)
+        try persistence.save(exercise: exercise)
+        if exercises.contains(where: { $0.id == exerciseID }) {
+            exercises = exercises.map { $0.id == exerciseID ? exercise : $0 }
         } else {
-            exerciseID = UUID().uuidString
-            let exercise = KnownExercise(id: exerciseID, name: command.name, aliases: command.aliases)
-            persistence.save(exercise: exercise)
             exercises.append(exercise)
             exercises.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         }
@@ -53,27 +44,25 @@ final class TrainingStore: ObservableObject {
             unit: command.unit,
             performedAt: Date()
         )
-        persistence.save(lift: lift)
+        try persistence.save(lift: lift)
         lifts.append(lift)
         return lift
     }
 
-    func update(_ lift: LiftRecord) {
-        persistence.save(lift: lift)
+    func update(_ lift: LiftRecord) throws {
+        try persistence.save(lift: lift)
         lifts = lifts.map { $0.id == lift.id ? lift : $0 }
     }
 
-    func delete(_ lift: LiftRecord) {
-        persistence.deleteLift(id: lift.id)
+    func delete(_ lift: LiftRecord) throws {
+        try persistence.deleteLift(id: lift.id)
         lifts.removeAll { $0.id == lift.id }
     }
 
-    func refreshSyncStatus() {
+    func refreshSyncStatus() async {
         let identifier = PersistenceController.cloudContainerIdentifier
-        Task {
-            let status = (try? await CKContainer(identifier: identifier).accountStatus()) ?? .couldNotDetermine
-            syncSummary = Self.summary(for: status)
-        }
+        let status = (try? await CKContainer(identifier: identifier).accountStatus()) ?? .couldNotDetermine
+        syncSummary = Self.summary(for: status)
     }
 
     private static func summary(for status: CKAccountStatus) -> String {
@@ -99,11 +88,15 @@ final class TrainingStore: ObservableObject {
             defaults.set(true, forKey: key)
             return
         }
-        for exercise in imported.exercises where !exercises.contains(where: { $0.id == exercise.id }) {
-            persistence.save(exercise: exercise)
-        }
-        for lift in imported.lifts where !lifts.contains(where: { $0.id == lift.id }) {
-            persistence.save(lift: lift)
+        do {
+            for exercise in imported.exercises where !exercises.contains(where: { $0.id == exercise.id }) {
+                try persistence.save(exercise: exercise)
+            }
+            for lift in imported.lifts where !lifts.contains(where: { $0.id == lift.id }) {
+                try persistence.save(lift: lift)
+            }
+        } catch {
+            return
         }
         defaults.set(true, forKey: key)
         reload()

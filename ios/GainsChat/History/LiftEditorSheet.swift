@@ -7,9 +7,10 @@ struct LiftEditorSheet: View {
     @State private var reps: Int
     @State private var unit: WeightUnit
     private let lift: LiftRecord
-    var onSave: (LiftRecord) -> Void
+    var onSave: (LiftRecord) throws -> Void
+    @State private var saveFailed = false
 
-    init(lift: LiftRecord, onSave: @escaping (LiftRecord) -> Void) {
+    init(lift: LiftRecord, onSave: @escaping (LiftRecord) throws -> Void) {
         self.lift = lift
         self.onSave = onSave
         _weight = State(initialValue: lift.weight)
@@ -29,6 +30,10 @@ struct LiftEditorSheet: View {
                     Text("lb").tag(WeightUnit.lb)
                     Text("kg").tag(WeightUnit.kg)
                 }
+                if saveFailed {
+                    Text("This set could not be saved.")
+                        .foregroundStyle(.red)
+                }
             }
             .navigationTitle("Edit set")
             .navigationBarTitleDisplayMode(.inline)
@@ -38,7 +43,7 @@ struct LiftEditorSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save)
-                        .disabled(weight <= 0 || reps <= 0)
+                        .disabled(weight <= 0 || reps <= 0 || reps > Int(Int16.max))
                 }
             }
         }
@@ -53,7 +58,11 @@ struct LiftEditorSheet: View {
         updated.weight = weight
         updated.reps = reps
         updated.unit = unit
-        onSave(updated)
-        dismiss()
+        do {
+            try onSave(updated)
+            dismiss()
+        } catch {
+            saveFailed = true
+        }
     }
 }
