@@ -46,13 +46,13 @@ Final recursive Yarn results:
 | --- | --- | --- | --- |
 | Frontend | 2 high | 2 high | 0 |
 | Functions, including framework | 2 (1 high, 1 moderate), development only | 0 | 2 |
-| EAS tooling | 5 (2 high, 2 moderate, 1 low), development only | 0 | 0 |
+| EAS tooling | 26 (7 high, 12 moderate, 7 low), development only | 0 | 0 |
 
 Frontend production audit includes Expo CLI and Metro because Expo declares build tools as dependencies. The two remaining findings concern that build/development toolchain; these packages are not native iPhone runtime libraries. This distinction does not remove their findings or make the development toolchain safe for untrusted inputs. The backend's remaining production messages are deprecations for glob and node-domexception, not vulnerability advisories. No full container/OS or comprehensive native SCA claim is made.
 
 Compatible scoped resolutions update Firestore's grpc-js, Xcode project UUID generation, CloudEvents IDs, Gaxios multipart IDs, Rudder IDs and Bunyan tracing IDs. All UUID replacements remain on the CommonJS-compatible 11.1.1 release; v1/v4 consumers retain those APIs. EAS's AJV, Joi (including eas-json), minimatch, nanoid, tar and yaml resolve patched compatible releases. Compatibility checks exercise actual EAS profile parsing, schema/ID/archive interfaces, Xcode IDs, Firestore initialization and CloudEvents serialization. No ESM-only UUID major or unrelated glob library is aliased into an old API.
 
-`security/dependency-audit-baseline.json` records the exact remaining advisory IDs, severities and versions for full and production graphs. CI always obtains fresh recursive reports and fails on new/changed findings or any critical finding. Existing findings remain printed and uploaded, rather than being hidden with broad audit exclusions. Remove baseline entries as their owning tools are remediated.
+`security/dependency-audit-baseline.json` records the exact remaining advisory IDs, severities and versions for full and production graphs. CI always obtains fresh recursive reports and fails on new/changed findings or any critical finding. Existing findings remain printed and uploaded, rather than being hidden with broad audit exclusions. The tooling baseline now also tracks the newly published deepmerge, fast-uri, Joi, minimatch, glob, and additional node-forge advisory IDs plus the new http-call deprecation report. Remove baseline entries as their owning tools are remediated.
 
 Yarn also reports upstream peer-metadata warnings in Expo/Firebase/Babel packages, and Expo Router's unused drawer-layout path requests Reanimated. This app uses JS tabs and no drawer; its production bundle and native compilation succeed without adding Reanimated/worklets solely to satisfy that unused path. Keep the node-modules linker. A future drawer feature must install Expo-aligned animation dependencies and repeat native validation; these warnings are not being presented as fixed.
 
