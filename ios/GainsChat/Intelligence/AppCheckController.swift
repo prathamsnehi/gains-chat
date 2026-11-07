@@ -2,6 +2,7 @@
 @preconcurrency import FirebaseCore
 import Foundation
 
+@MainActor
 final class AppCheckController: NSObject, AppCheckProviderFactory {
     static let shared = AppCheckController()
     private var isConfigured = false
@@ -29,7 +30,7 @@ final class AppCheckController: NSObject, AppCheckProviderFactory {
         }
     }
 
-    func createProvider(with app: FirebaseApp) -> AppCheckProvider? {
+    nonisolated func createProvider(with app: FirebaseApp) -> AppCheckProvider? {
         #if DEBUG
         return AppCheckDebugProvider(app: app)
         #else
