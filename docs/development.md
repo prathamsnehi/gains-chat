@@ -26,6 +26,8 @@ Function tests:
 node --test hosting/functions/chatCore.test.js
 ```
 
+GitHub Actions runs those two checks on Linux. A separate job on a Mac builds `ios/GainsChat.xcodeproj` for the iOS Simulator with signing turned off, and runs `swift test` with the Xcode toolchain. That job does not archive or sign for a device. A signed archive still needs the team certificate on a Mac.
+
 Set the chat key before a deploy. Do not commit it and do not paste it into chat:
 
 ```sh
