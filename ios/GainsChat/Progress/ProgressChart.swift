@@ -55,22 +55,7 @@ struct ProgressChart: View {
                     selection = date.flatMap { nearest(to: $0)?.id }
                 }
         } else {
-            marks.chartOverlay { proxy in
-                GeometryReader { _ in
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .accessibilityHidden(true)
-                        .gesture(
-                            DragGesture(minimumDistance: 12).onChanged { value in
-                                guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                                let x = value.location.x - proxy.plotAreaFrame.origin.x
-                                if let date: Date = proxy.value(atX: x, as: Date.self) {
-                                    selection = nearest(to: date)?.id
-                                }
-                            }
-                        )
-                }
-            }
+            marks
         }
     }
 
