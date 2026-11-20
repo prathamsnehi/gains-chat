@@ -2,8 +2,10 @@
 
 Two Core Data configurations share one container.
 
-- `Cloud` holds `Exercise` and `Lift` and syncs to `iCloud.com.blackmaskexe.gainschat`.
+- `Cloud` holds `Exercise`, `Lift`, `Athlete`, and `BodyweightSample`, and syncs to `iCloud.com.blackmaskexe.gainschat`.
 - `Local` holds `ChatLine` and never syncs.
+
+`Athlete` stores the current bodyweight. `BodyweightSample` stores each saved reading (id, weight, unit, recorded time) so the bodyweight page can chart it. A production CloudKit schema has to include `BodyweightSample` before those rows sync; the phone keeps them either way.
 
 An exercise has a stable id, a canonical name, and aliases such as `bp` or `mid back row`. A lift has a stable id, exercise id, display name, weight, reps, unit, and performed time. Reps can be a half, such as 6.5. Bare weights are pounds. An explicit kilogram stays kilograms. Estimated one-rep max is `weight × (1 + reps / 30)`.
 
@@ -11,4 +13,4 @@ There is no preloaded exercise list. The shorthand parser expands familiar langu
 
 On first launch the app reads an older `GainsLocalStore/Cloud.sqlite` if it is still on the phone. `LegacyImporter` keeps lift, exercise, and alias rows and ignores goals. New writes use the new entities only.
 
-A local save does not prove the CloudKit export finished. The Chat toolbar shows the iCloud account status.
+A local save does not prove the CloudKit export finished. Settings shows the iCloud account status on the page.

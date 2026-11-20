@@ -20,7 +20,7 @@ struct RootNavigationView: View {
                 ZStack {
                     ChatView(chat: chat, training: training, openSidebar: openSidebar)
                         .modifier(SectionVisibility(active: section == .chat))
-                    LogsView(training: training, openChat: { select(.chat) }, openSidebar: openSidebar)
+                    LogsView(training: training, openChat: { select(.chat) }, ask: askAboutLift, openSidebar: openSidebar)
                         .modifier(SectionVisibility(active: section == .logs))
                     SettingsView(training: training, chat: chat, openSidebar: openSidebar)
                         .modifier(SectionVisibility(active: section == .settings))
@@ -104,6 +104,12 @@ struct RootNavigationView: View {
         // Resign the active text input without clearing a draft or search query.
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         setSidebar(open: true)
+    }
+
+    private func askAboutLift(_ question: String) -> Bool {
+        guard chat.ask(question) else { return false }
+        select(.chat)
+        return true
     }
 
     private func select(_ destination: AppSection) {

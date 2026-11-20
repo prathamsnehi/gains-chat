@@ -101,7 +101,7 @@ final class PersistenceController {
         try commit()
     }
 
-    func save(bodyweight: BodyweightReading) throws {
+    func save(bodyweight: BodyweightReading, recordedAt: Date = .now) throws {
         guard bodyweight.weight.isFinite, bodyweight.weight > 0 else {
             throw StoreError.unreadableValue
         }
@@ -110,6 +110,11 @@ final class PersistenceController {
         object.setValue(Self.athleteID, forKey: "id")
         object.setValue(bodyweight.weight, forKey: "bodyweight")
         object.setValue(bodyweight.unit.rawValue, forKey: "unit")
+        let sample = NSEntityDescription.insertNewObject(forEntityName: "BodyweightSample", into: context)
+        sample.setValue(UUID().uuidString, forKey: "id")
+        sample.setValue(bodyweight.weight, forKey: "weight")
+        sample.setValue(bodyweight.unit.rawValue, forKey: "unit")
+        sample.setValue(recordedAt, forKey: "recordedAt")
         try commit()
     }
 
@@ -118,6 +123,12 @@ final class PersistenceController {
         guard let weight = Self.doubleValue(object, key: "bodyweight"), weight > 0 else { return nil }
         let unit = WeightUnit(rawValue: object.value(forKey: "unit") as? String ?? "") ?? .lb
         return BodyweightReading(weight: weight, unit: unit)
+    }
+
+    func loadBodyweightSamples() -> [BodyweightSample] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: "BodyweightSample")
+        let rows = (try? container.viewContext.fetch(request)) ?? []
+        return rows.compactMap(Self.sample).sorted { $0.recordedAt < $1.recordedAt }
     }
 
     func deleteLift(id: String) throws {
@@ -136,7 +147,7 @@ final class PersistenceController {
 
     func deleteAll() throws {
         let context = container.viewContext
-        for name in ["Exercise", "Lift", "Athlete", "ChatLine"] {
+        for name in ["Exercise", "Lift", "Athlete", "BodyweightSample", "ChatLine"] {
             let request = NSFetchRequest<NSManagedObject>(entityName: name)
             let rows = try context.fetch(request)
             rows.forEach(context.delete)
@@ -263,14 +274,28 @@ final class PersistenceController {
         let athlete = entity("Athlete", attributes: [
             string("id"), optionalDouble("bodyweight"), string("unit", defaultValue: "lb"),
         ])
+        let sample = entity("BodyweightSample", attributes: [
+            string("id"), double("weight"), string("unit", defaultValue: "lb"), date("recordedAt"),
+        ])
         let chat = entity("ChatLine", attributes: [
             string("id"), string("role"), string("text"), date("createdAt"),
         ])
         let model = NSManagedObjectModel()
-        model.entities = [exercise, lift, athlete, chat]
-        model.setEntities([exercise, lift, athlete], forConfigurationName: "Cloud")
+        model.entities = [exercise, lift, athlete, sample, chat]
+        model.setEntities([exercise, lift, athlete, sample], forConfigurationName: "Cloud")
         model.setEntities([chat], forConfigurationName: "Local")
         return model
+    }
+
+    private static func sample(_ object: NSManagedObject) -> BodyweightSample? {
+        guard
+            let id = object.value(forKey: "id") as? String,
+            let recordedAt = object.value(forKey: "recordedAt") as? Date,
+            let weight = doubleValue(object, key: "weight"),
+            weight > 0
+        else { return nil }
+        let unit = WeightUnit(rawValue: object.value(forKey: "unit") as? String ?? "") ?? .lb
+        return BodyweightSample(id: id, weight: weight, unit: unit, recordedAt: recordedAt)
     }
 
     private static let athleteID = "athlete"

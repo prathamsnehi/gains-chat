@@ -15,21 +15,51 @@ struct ChatView: View {
                 .toolbar { SidebarButton(action: openSidebar) }
                 .navigationBarTitleDisplayMode(.inline)
                 .safeAreaInset(edge: .bottom) {
-                    ComposerBar(text: $draft, busy: chat.activity != nil, add: chat.openForm) {
-                        let submitted = draft
-                        draft = ""
-                        chat.send(submitted)
-                    }.padding(.horizontal).padding(.bottom, 6)
-                }
-                .alert("Use the online assistant?", isPresented: $chat.requestingConsent) {
-                    Button("Allow") { chat.consent = true; chat.startOnline() }
-                    Button("Cancel", role: .cancel) {}
-                } message: {
-                    Text("Your messages, relevant workout records, and tool results will be sent through Firebase to TokenRouter and its AI provider. You can change this in Settings.")
+                    VStack(alignment: .leading, spacing: 8) {
+                        consentNotice
+                        ComposerBar(text: $draft, busy: chat.activity != nil, add: chat.openForm, send: submit, stop: chat.stop)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 6)
                 }
                 .alert("Gains Chat", isPresented: Binding(get: { chat.error != nil }, set: { if !$0 { chat.error = nil } })) {
                     Button("OK") { chat.error = nil }
                 } message: { Text(chat.error ?? "") }
         }
+    }
+
+    @ViewBuilder
+    private var consentNotice: some View {
+        if chat.requestingConsent {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("The online assistant sends recent conversation and relevant workout records through Firebase to TokenRouter and its model provider. Sets stay on this phone.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 8) {
+                    Button("Not now", action: chat.declineConsent)
+                    Button("Allow") {
+                        chat.consent = true
+                        chat.startOnline()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .frame(minHeight: AppMetrics.minimumTap)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppPalette.surface, in: RoundedRectangle(cornerRadius: 16))
+        } else if !chat.consent {
+            Text("Questions leave this phone. Sets stay here.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    private func submit() {
+        let submitted = draft
+        draft = ""
+        chat.send(submitted)
     }
 }
