@@ -7,6 +7,7 @@ struct ComposerBar: View {
     let busy: Bool
     var add: () -> Void
     var send: () -> Void
+    var stop: () -> Void
     @StateObject private var speech = DraftDictation()
 
     var body: some View {
@@ -28,9 +29,15 @@ struct ComposerBar: View {
                 } label: {
                     Image(systemName: speech.active ? "stop.fill" : "mic").frame(width: 44, height: 44)
                 }.accessibilityLabel(speech.active ? "Stop dictation" : "Dictate message")
-                Button { speech.stop(); send() } label: {
-                    Image(systemName: "arrow.up.circle.fill").font(.title).frame(width: 44, height: 44)
-                }.disabled(busy || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityLabel("Send")
+                Button {
+                    if busy { stop() } else { speech.stop(); send() }
+                } label: {
+                    Image(systemName: busy ? "stop.circle.fill" : "arrow.up.circle.fill")
+                        .font(.title)
+                        .frame(width: 44, height: 44)
+                }
+                .disabled(!busy && text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .accessibilityLabel(busy ? "Stop" : "Send")
             }
         }.padding(8).background(AppPalette.surface, in: RoundedRectangle(cornerRadius: 23))
             .shadow(color: .black.opacity(0.07), radius: 7, y: 2)

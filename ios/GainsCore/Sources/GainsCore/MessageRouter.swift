@@ -58,7 +58,7 @@ public enum MessageRouter {
     ) -> Route {
         if factorsBodyweight {
             guard let bodyweight, bodyweight.weight > 0 else {
-                return .clarify("Set your bodyweight in Settings before logging that exercise.")
+                return .clarify("Set your bodyweight from Log or Settings before logging that exercise.")
             }
             let snapshot = OneRepMax.convert(bodyweight.weight, from: bodyweight.unit, to: draft.unit)
             guard snapshot + draft.weight > 0 else {

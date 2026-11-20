@@ -29,6 +29,7 @@
 
 
 /* Begin PBXBuildFile section */
+		A100000000000000000000A0 /* BodyweightLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000A1 /* BodyweightLogView.swift */; };
 		A1000000000000000000001C /* AppCheckController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* AppCheckController.swift */; };
 		A1000000000000000000001D /* AppMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* AppMetrics.swift */; };
 		A1000000000000000000001E /* AppSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* AppSection.swift */; };
@@ -94,6 +95,7 @@
 		A10000000000000000000041 /* GainsChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GainsChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000080 /* AppPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPalette.swift; sourceTree = "<group>"; };
 		A10000000000000000000082 /* ChatTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscript.swift; sourceTree = "<group>"; };
+		A100000000000000000000A1 /* BodyweightLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyweightLogView.swift; sourceTree = "<group>"; };
 		A10000000000000000000084 /* ChartRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRange.swift; sourceTree = "<group>"; };
 		A10000000000000000000086 /* ChartRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRangePicker.swift; sourceTree = "<group>"; };
 		A10000000000000000000088 /* ExerciseChartCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseChartCard.swift; sourceTree = "<group>"; };
@@ -168,6 +170,7 @@
 		A10000000000000000000096 /* Logs */ = {
 			isa = PBXGroup;
 			children = (
+				A100000000000000000000A1 /* BodyweightLogView.swift */,
 				A10000000000000000000084 /* ChartRange.swift */,
 				A10000000000000000000086 /* ChartRangePicker.swift */,
 				A10000000000000000000088 /* ExerciseChartCard.swift */,
@@ -342,6 +345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A100000000000000000000A0 /* BodyweightLogView.swift in Sources */,
 				A1000000000000000000001C /* AppCheckController.swift in Sources */,
 				A1000000000000000000001D /* AppMetrics.swift in Sources */,
 				A1000000000000000000001E /* AppSection.swift in Sources */,

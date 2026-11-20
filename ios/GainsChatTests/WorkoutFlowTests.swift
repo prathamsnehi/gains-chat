@@ -66,6 +66,42 @@ final class WorkoutFlowTests: XCTestCase {
         XCTAssertEqual(training.history(id).last?.bodyweightSnapshot, 80)
     }
 
+    func testBodyweightReadingsAccumulateAndReload() throws {
+        let training = library()
+        let earlier = Date(timeIntervalSince1970: 1_700_000_000)
+        let later = Date(timeIntervalSince1970: 1_700_086_400)
+        try training.save(bodyweight: BodyweightReading(weight: 180, unit: .lb), at: earlier)
+        try training.save(bodyweight: BodyweightReading(weight: 182, unit: .lb), at: later)
+        XCTAssertEqual(training.bodyweight?.weight, 182)
+        XCTAssertEqual(training.bodyweightSamples.map(\.weight), [180, 182])
+        let restored = TrainingStore(persistence: training.persistence, defaults: training.defaults)
+        XCTAssertEqual(restored.bodyweightSamples.map(\.id), training.bodyweightSamples.map(\.id))
+        try restored.deleteAll()
+        XCTAssertTrue(restored.bodyweightSamples.isEmpty)
+        XCTAssertNil(restored.bodyweight)
+    }
+
+    func testAskingAboutALiftDoesNotSaveASet() {
+        let training = library()
+        let chat = ChatStore(training: training)
+        XCTAssertTrue(chat.ask("Barbell Bench Press: 155 5"))
+        XCTAssertTrue(training.lifts.isEmpty)
+        XCTAssertTrue(chat.requestingConsent)
+        XCTAssertFalse(chat.ask("another question"))
+    }
+
+    func testDecliningConsentLeavesTheQuestionOnDevice() {
+        let training = library()
+        let chat = ChatStore(training: training)
+        XCTAssertFalse(chat.consent)
+        chat.send("what is my bench progress?")
+        XCTAssertTrue(chat.requestingConsent)
+        XCTAssertTrue(training.lifts.isEmpty)
+        chat.declineConsent()
+        XCTAssertFalse(chat.requestingConsent)
+        XCTAssertTrue(chat.messages.contains { $0.text.contains("this phone") })
+    }
+
     func testExplicitMultipleSetsAskBeforeSaving() {
         let training = library()
         let chat = ChatStore(training: training)

@@ -7,6 +7,7 @@ final class TrainingStore: ObservableObject {
     @Published private(set) var exercises: [KnownExercise] = []
     @Published private(set) var lifts: [LiftRecord] = []
     @Published private(set) var bodyweight: BodyweightReading?
+    @Published private(set) var bodyweightSamples: [BodyweightSample] = []
     @Published private(set) var syncSummary = "Checking iCloud…"
 
     @Published var unit: WeightUnit { didSet { defaults.set(unit.rawValue, forKey: "displayUnit") } }
@@ -61,6 +62,18 @@ final class TrainingStore: ObservableObject {
         exercises = library.exercises.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         lifts = library.lifts
         bodyweight = persistence.loadBodyweight()
+        bodyweightSamples = persistence.loadBodyweightSamples()
+    }
+
+    func previousLift(before set: LiftRecord) -> LiftRecord? {
+        history(set.exerciseID).first { $0.id != set.id && $0.performedAt <= set.performedAt }
+    }
+
+    /// Latest estimate minus the one before it, in the display unit.
+    func movement(for exerciseID: String) -> Double? {
+        let estimates = history(exerciseID).reversed().compactMap { $0.estimate(unit: unit, formula: formula) }
+        guard estimates.count >= 2 else { return nil }
+        return estimates[estimates.count - 1] - estimates[estimates.count - 2]
     }
 
     func apply(_ command: LogCommand, operationID: String = UUID().uuidString, date: Date = .now) throws -> LiftRecord {
@@ -94,9 +107,10 @@ final class TrainingStore: ObservableObject {
         return lift
     }
 
-    func save(bodyweight reading: BodyweightReading) throws {
-        try persistence.save(bodyweight: reading)
+    func save(bodyweight reading: BodyweightReading, at date: Date = .now) throws {
+        try persistence.save(bodyweight: reading, recordedAt: date)
         bodyweight = reading
+        bodyweightSamples = persistence.loadBodyweightSamples()
     }
 
     func addExercise(name: String, factorsBodyweight: Bool) throws {
@@ -141,6 +155,7 @@ final class TrainingStore: ObservableObject {
         exercises = []
         lifts = []
         bodyweight = nil
+        bodyweightSamples = []
         visits = [:]
         defaults.removeObject(forKey: "exerciseVisits")
     }

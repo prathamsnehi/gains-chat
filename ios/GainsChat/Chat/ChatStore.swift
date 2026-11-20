@@ -23,6 +23,7 @@ final class ChatStore: ObservableObject {
         #endif
     }
     private var task: Task<Void, Never>?
+    private var stopRequested = false
     private var waitingFormID: String?
     private var formReply: CheckedContinuation<String, Never>?
 
@@ -173,6 +174,29 @@ final class ChatStore: ObservableObject {
         if consent { startOnline() } else { requestingConsent = true }
     }
 
+    /// Sends a question without trying to parse it as a logged set.
+    @discardableResult
+    func ask(_ raw: String) -> Bool {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard activity == nil, !requestingConsent, !trimmed.isEmpty else { return false }
+        pendingTurn = append(.user, trimmed)
+        if consent { startOnline() } else { requestingConsent = true }
+        return true
+    }
+
+    func declineConsent() {
+        requestingConsent = false
+        guard pendingTurn != nil else { return }
+        pendingTurn = nil
+        append(.assistant, "Kept that on this phone. Allow the online assistant in Settings when you want an answer.")
+    }
+
+    func stop() {
+        guard activity != nil else { return }
+        stopRequested = true
+        task?.cancel()
+    }
+
     func startOnline() {
         requestingConsent = false
         guard consent, let turn = pendingTurn else { return }
@@ -182,10 +206,18 @@ final class ChatStore: ObservableObject {
             return
         }
         started = .now
+        stopRequested = false
         activity = "Working…"
         mark("pending")
         task = Task {
-            defer { activity = nil }
+            defer {
+                let stopped = stopRequested
+                stopRequested = false
+                activity = nil
+                if stopped, messages.last?.role == .user {
+                    append(.assistant, "Stopped.")
+                }
+            }
             do { try await run(turn) }
             catch {
                 if !Task.isCancelled {
@@ -363,7 +395,13 @@ final class ChatStore: ObservableObject {
             guard let weight = a["weight"] as? Double else { throw StoreError.unreadableValue }
             try training.save(bodyweight: BodyweightReading(weight: weight, unit: unit))
             let value = OneRepMax.convert(weight, from: unit, to: training.unit).formatted(.number.precision(.fractionLength(0...1)))
-            let confirmation = "Bodyweight saved · \(value) \(training.unit.label)"
+            var confirmation = "Bodyweight saved at \(value) \(training.unit.label)."
+            let series = training.bodyweightSamples.map {
+                SeriesValue(date: $0.recordedAt, value: $0.value(in: training.unit))
+            }
+            if let change = SeriesSummary.make(values: series)?.changeSentence(unitLabel: training.unit.label, comparedWith: "the previous reading") {
+                confirmation += " " + change
+            }
             append(.assistant, confirmation, operation: turn)
             return confirmation
         default: throw StoreError.unreadableValue

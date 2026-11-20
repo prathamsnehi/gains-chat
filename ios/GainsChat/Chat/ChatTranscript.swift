@@ -18,13 +18,20 @@ struct ChatTranscript: View {
                             ChatMessageRow(message: message, training: training, chat: chat).id(message.id)
                         }
                         if let activity = chat.activity {
-                            HStack { ProgressView(); Text(activity).font(.footnote).foregroundStyle(.secondary) }
+                            HStack(spacing: 10) {
+                                ProgressView()
+                                Text(activity)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .accessibilityElement(children: .combine)
                         }
                         Color.clear.frame(height: 1).id("bottom")
                     }.padding()
                 }
                 .onAppear { proxy.scrollTo("bottom", anchor: .bottom) }
                 .onChange(of: chat.messages.last) { _ in proxy.scrollTo("bottom", anchor: .bottom) }
+                .onChange(of: chat.activity) { _ in proxy.scrollTo("bottom", anchor: .bottom) }
                 .scrollDismissesKeyboard(.interactively)
             }
         }

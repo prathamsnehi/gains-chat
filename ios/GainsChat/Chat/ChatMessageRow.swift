@@ -21,17 +21,11 @@ struct ChatMessageRow: View {
                 switch message.attachment {
                 case .record(let id, let before):
                     if let set = training.lifts.first(where: { $0.id == id }) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Label(set.exerciseName, systemImage: "checkmark.circle.fill").font(.headline)
-                            if let before, before.weightText(in: training.unit) != set.weightText(in: training.unit) {
-                                Text("\(before.weightText(in: training.unit)) → \(set.weightText(in: training.unit)) · \(set.reps.formatted()) reps")
-                            } else { Text("\(set.weightText(in: training.unit)) × \(set.reps.formatted())") }
-                            HStack {
-                                Button("Edit") { editing = set }
-                                Button("Undo") { chat.undo(message) }
-                            }.font(.subheadline).buttonStyle(.bordered).disabled(chat.activity != nil)
-                        }.padding().frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppPalette.surface, in: RoundedRectangle(cornerRadius: 16))
+                        RecordCard(set: set, before: before, training: training, busy: chat.activity != nil) {
+                            editing = set
+                        } undo: {
+                            chat.undo(message)
+                        }
                     } else { Text("Top set removed").foregroundStyle(.secondary) }
                 case .deleted: Button("Undo") { chat.undo(message) }
                 case .form(let name, let bw):
@@ -46,8 +40,25 @@ struct ChatMessageRow: View {
                     Text(training.exercises.first { $0.id == exercise }?.name ?? "Progress").font(.headline)
                     ExerciseChartCard(range: .constant(range), points: training.points(exercise, range: range), showsRanges: false)
                 case .choices(let options):
-                    ForEach(options, id: \.self) { option in
-                        Button(option) { chat.send(option) }.buttonStyle(.bordered).disabled(chat.activity != nil)
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(options, id: \.self) { option in
+                            Button { chat.send(option) } label: {
+                                HStack(spacing: 8) {
+                                    Text(option)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer(minLength: 8)
+                                    Image(systemName: "chevron.right")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                        .accessibilityHidden(true)
+                                }
+                                .padding(.horizontal, 14)
+                                .frame(maxWidth: .infinity, minHeight: AppMetrics.minimumTap, alignment: .leading)
+                                .background(AppPalette.surface, in: RoundedRectangle(cornerRadius: 14))
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(chat.activity != nil)
+                        }
                     }
                 case .retry(let turn):
                     if chat.messages.last?.id == message.id {
@@ -60,6 +71,54 @@ struct ChatMessageRow: View {
                     LiftEditorSheet(lift: set, factorsBodyweight: set.bodyweightSnapshot != nil, displayUnit: training.unit, formula: training.formula, onSave: training.update)
                 }
         }
+    }
+}
+
+private struct RecordCard: View {
+    var set: LiftRecord
+    var before: LiftRecord?
+    @ObservedObject var training: TrainingStore
+    var busy: Bool
+    var edit: () -> Void
+    var undo: () -> Void
+
+    var body: some View {
+        let previous = training.previousLift(before: set)
+        let sentence = RecordComparison.sentence(
+            estimate: set.estimate(unit: training.unit, formula: training.formula),
+            previous: previous?.estimate(unit: training.unit, formula: training.formula),
+            unitLabel: training.unit.label
+        )
+        VStack(alignment: .leading, spacing: 8) {
+            Label(set.exerciseName, systemImage: "checkmark.circle.fill")
+                .font(.headline)
+            Text(loadLine)
+                .font(.body)
+            if let sentence {
+                Text(sentence)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            HStack(spacing: 8) {
+                Button("Edit", action: edit)
+                Button("Undo", action: undo)
+            }
+            .font(.subheadline)
+            .buttonStyle(.bordered)
+            .disabled(busy)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppPalette.surface, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .contain)
+    }
+
+    private var loadLine: String {
+        if let before, before.weightText(in: training.unit) != set.weightText(in: training.unit) {
+            return "\(before.weightText(in: training.unit)) → \(set.weightText(in: training.unit)) · \(set.reps.formatted()) reps"
+        }
+        return "\(set.weightText(in: training.unit)) × \(set.reps.formatted())"
     }
 }
 
