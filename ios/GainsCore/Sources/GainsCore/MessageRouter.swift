@@ -5,29 +5,32 @@ public enum MessageRouter {
         text: String,
         exercises: [KnownExercise],
         lifts: [LiftRecord],
+        bodyweight: BodyweightReading? = nil,
+        defaultUnit: WeightUnit = .lb,
         scores: (String) -> IntentScores
     ) -> Route {
-        switch ShorthandParser.parse(text) {
+        switch ShorthandParser.parse(text, defaultUnit: defaultUnit) {
         case .lift(let draft):
             switch ExerciseReconciler.reconcile(draft, with: exercises) {
             case .matched(let exerciseID, let name, let aliases):
-                return .log(LogCommand(
+                let factors = exercises.first { $0.id == exerciseID }?.factorsBodyweight ?? false
+                return logged(
+                    draft: draft,
                     exerciseID: exerciseID,
                     name: name,
                     aliases: aliases,
-                    weight: draft.weight,
-                    reps: draft.reps,
-                    unit: draft.unit
-                ))
+                    factorsBodyweight: factors,
+                    bodyweight: bodyweight
+                )
             case .created(let name, let aliases):
-                return .log(LogCommand(
+                return logged(
+                    draft: draft,
                     exerciseID: nil,
                     name: name,
                     aliases: aliases,
-                    weight: draft.weight,
-                    reps: draft.reps,
-                    unit: draft.unit
-                ))
+                    factorsBodyweight: false,
+                    bodyweight: bodyweight
+                )
             case .ambiguous(let names):
                 return .clarify("Which exercise did you mean: \(names.joined(separator: ", "))?")
             }
@@ -43,5 +46,44 @@ public enum MessageRouter {
                 snippets: SnippetSelector.select(text: text, exercises: exercises, lifts: lifts)
             )
         }
+    }
+
+    private static func logged(
+        draft: LiftDraft,
+        exerciseID: String?,
+        name: String,
+        aliases: [String],
+        factorsBodyweight: Bool,
+        bodyweight: BodyweightReading?
+    ) -> Route {
+        if factorsBodyweight {
+            guard let bodyweight, bodyweight.weight > 0 else {
+                return .clarify("Set your bodyweight in Settings before logging that exercise.")
+            }
+            let snapshot = OneRepMax.convert(bodyweight.weight, from: bodyweight.unit, to: draft.unit)
+            guard snapshot + draft.weight > 0 else {
+                return .clarify("Assistance can’t be more than your bodyweight.")
+            }
+            return .log(LogCommand(
+                exerciseID: exerciseID,
+                name: name,
+                aliases: aliases,
+                weight: draft.weight,
+                reps: draft.reps,
+                unit: draft.unit,
+                bodyweightSnapshot: snapshot
+            ))
+        }
+        guard draft.weight > 0 else {
+            return .clarify("Send a weight above zero for that exercise.")
+        }
+        return .log(LogCommand(
+            exerciseID: exerciseID,
+            name: name,
+            aliases: aliases,
+            weight: draft.weight,
+            reps: draft.reps,
+            unit: draft.unit
+        ))
     }
 }

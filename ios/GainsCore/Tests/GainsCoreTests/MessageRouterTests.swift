@@ -95,4 +95,52 @@ struct MessageRouterTests {
         #expect(snippets[0].exerciseName == "Mid Back Row")
         #expect(snippets[0].weight == 110)
     }
+
+    @Test func aBodyweightExerciseCopiesTheCurrentBodyweight() {
+        let exercise = KnownExercise(id: "pu", name: "Pull-Up", aliases: ["pull-up"], factorsBodyweight: true)
+        let route = MessageRouter.decide(
+            text: "pullup -20 8",
+            exercises: [exercise],
+            lifts: [],
+            bodyweight: BodyweightReading(weight: 180, unit: .lb),
+            scores: { _ in IntentScores(log: 0.2, question: 0.8) }
+        )
+        guard case .log(let command) = route else {
+            Issue.record("expected a log, got \(route)")
+            return
+        }
+        #expect(command.weight == -20)
+        #expect(command.bodyweightSnapshot == 180)
+        #expect(command.exerciseID == "pu")
+    }
+
+    @Test func aBodyweightExerciseWithoutASettingAsksInsteadOfSaving() {
+        let exercise = KnownExercise(id: "pu", name: "Pull-Up", aliases: ["pull-up"], factorsBodyweight: true)
+        let route = MessageRouter.decide(
+            text: "pullup 0 8",
+            exercises: [exercise],
+            lifts: [],
+            scores: { _ in IntentScores(log: 0.9, question: 0.1) }
+        )
+        guard case .clarify(let message) = route else {
+            Issue.record("expected clarification, got \(route)")
+            return
+        }
+        #expect(message.contains("Settings"))
+    }
+
+    @Test func assistancePastBodyweightIsRejected() {
+        let exercise = KnownExercise(id: "pu", name: "Pull-Up", aliases: ["pull-up"], factorsBodyweight: true)
+        let route = MessageRouter.decide(
+            text: "pullup -200 8",
+            exercises: [exercise],
+            lifts: [],
+            bodyweight: BodyweightReading(weight: 180, unit: .lb),
+            scores: { _ in IntentScores(log: 0.9, question: 0.1) }
+        )
+        guard case .clarify = route else {
+            Issue.record("expected clarification, got \(route)")
+            return
+        }
+    }
 }

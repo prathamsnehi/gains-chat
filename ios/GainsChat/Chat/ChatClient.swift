@@ -1,43 +1,37 @@
 import Foundation
-import GainsCore
 
 @MainActor
 struct ChatClient {
+    typealias Item = [String: Any]
     var endpoint: URL
     var token: @MainActor () async throws -> String
     var session: URLSession = .shared
 
-    static func live() -> ChatClient {
-        let endpoint = Bundle.main.object(forInfoDictionaryKey: "ChatEndpoint") as? String
-        return ChatClient(
-            endpoint: URL(string: endpoint ?? "") ?? URL(string: "https://gains-chat.web.app/chat")!,
-            token: { try await AppCheckController.shared.token() }
-        )
+    static func live() -> Self {
+        let url = Bundle.main.object(forInfoDictionaryKey: "ChatEndpoint") as? String
+        return Self(endpoint: URL(string: url ?? "https://us-central1-gains-chat.cloudfunctions.net/chat")!,
+                    token: { try await AppCheckController.shared.token() })
     }
 
-    func reply(text: String, snippets: [LiftSnippet]) async throws -> String {
+    func stream(input: [Item], unit: String, event: (String, Item) throws -> Void) async throws -> [Item] {
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
+        request.timeoutInterval = 65
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(try await token(), forHTTPHeaderField: "X-Firebase-AppCheck")
-        let lifts = snippets.map { snippet in
-            [
-                "exerciseName": snippet.exerciseName,
-                "weight": snippet.weight,
-                "reps": snippet.reps,
-                "unit": snippet.unit.rawValue,
-                "performedAt": ISO8601DateFormatter().string(from: snippet.performedAt),
-            ] as [String: Any]
+        request.httpBody = try JSONSerialization.data(withJSONObject: ["input": input, "displayUnit": unit])
+        let (bytes, response) = try await session.bytes(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
+        for try await line in bytes.lines where line.hasPrefix("data:") {
+            try Task.checkCancellation()
+            let payload = line.dropFirst(5).trimmingCharacters(in: .whitespaces)
+            guard payload != "[DONE]", let item = try JSONSerialization.jsonObject(with: Data(payload.utf8)) as? Item,
+                  let type = item["type"] as? String else { continue }
+            try event(type, item)
+            if type == "response.completed", let response = item["response"] as? Item,
+               let output = response["output"] as? [Item] { return output }
+            if ["response.failed","error","response.incomplete"].contains(type) { throw URLError(.badServerResponse) }
         }
-        request.httpBody = try JSONSerialization.data(withJSONObject: ["text": text, "lifts": lifts])
-        let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let message = object?["message"] as? String, !message.isEmpty else {
-            throw URLError(.cannotParseResponse)
-        }
-        return message
+        throw URLError(.networkConnectionLost)
     }
 }

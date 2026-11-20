@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ShorthandParser {
-    public static func parse(_ text: String) -> ParseResult {
+    public static func parse(_ text: String, defaultUnit: WeightUnit = .lb) -> ParseResult {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return .notALog }
 
@@ -9,11 +9,11 @@ public enum ShorthandParser {
         let exerciseTokens = exerciseTokens(in: trimmed)
         let phrase = ExercisePhraseBuilder.phrase(from: exerciseTokens)
 
-        if assign(numbers) == nil, isQuestion(trimmed) {
+        if assign(numbers, defaultUnit: defaultUnit) == nil, isQuestion(trimmed) {
             return .notALog
         }
 
-        guard let assignment = assign(numbers) else {
+        guard let assignment = assign(numbers, defaultUnit: defaultUnit) else {
             if phrase == nil, numbers.isEmpty {
                 return .notALog
             }
@@ -69,7 +69,7 @@ public enum ShorthandParser {
         var marker: String
     }
 
-    private static func assign(_ numbers: [FoundNumber]) -> Assignment? {
+    private static func assign(_ numbers: [FoundNumber], defaultUnit: WeightUnit) -> Assignment? {
         let meaningful = numbers.filter { $0.marker != "set" }
         guard meaningful.count == 2 else { return nil }
         var weight: FoundNumber?
@@ -89,15 +89,15 @@ public enum ShorthandParser {
         } else if let weight, reps == nil {
             reps = meaningful.first { $0.value != weight.value || $0.marker != weight.marker }
         }
-        guard let weight, let reps, weight.value > 0, reps.value > 0, reps.value <= 1000, weight.value <= 2000 else {
+        guard let weight, let reps, weight.value.isFinite, abs(weight.value) <= 2000, reps.value > 0, reps.value <= 1000 else {
             return nil
         }
-        let unit: WeightUnit = isKilogram(weight.marker) || meaningful.contains { isKilogram($0.marker) } ? .kg : .lb
+        let unit: WeightUnit = isKilogram(weight.marker) || meaningful.contains { isKilogram($0.marker) } ? .kg : (meaningful.contains { $0.marker == "lb" } ? .lb : defaultUnit)
         return Assignment(weight: weight.value, reps: reps.value, unit: unit)
     }
 
     private static func extractNumbers(_ text: String) -> [FoundNumber] {
-        guard let regex = try? NSRegularExpression(pattern: #"(^|[^\d.])(\d+(?:\.\d+)?)"#, options: []) else {
+        guard let regex = try? NSRegularExpression(pattern: #"(^|[^\d.])(-?\d+(?:\.\d+)?)"#, options: []) else {
             return []
         }
         let range = NSRange(text.startIndex..., in: text)
@@ -152,7 +152,7 @@ public enum ShorthandParser {
             let range = NSRange(stripped.startIndex..., in: stripped)
             stripped = regex.stringByReplacingMatches(in: stripped, range: range, withTemplate: " ")
         }
-        let unitWords: Set<String> = ["kg", "kgs", "lb", "lbs", "pound", "pounds", "rep", "reps", "set", "sets", "x"]
+        let unitWords: Set<String> = ["kg", "kgs", "lb", "lbs", "kilogram", "kilograms", "pound", "pounds", "rep", "reps", "set", "sets", "x"]
         return ExercisePhraseBuilder.tokens(in: stripped).filter { !unitWords.contains($0) }
     }
 }

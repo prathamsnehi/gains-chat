@@ -6,10 +6,32 @@
 	objectVersion = 63;
 	objects = {
 
+        D10000000000000000000001 /* GainsChatTests */ = {isa = PBXNativeTarget; name = GainsChatTests; buildConfigurationList = D10000000000000000000006; buildPhases = (D10000000000000000000005,); buildRules = (); dependencies = (D10000000000000000000007,); productName = GainsChatTests; productReference = D10000000000000000000002; productType = "com.apple.product-type.bundle.unit-test"; };
+        D20000000000000000000001 /* GainsChatUITests */ = {isa = PBXNativeTarget; name = GainsChatUITests; buildConfigurationList = D20000000000000000000006; buildPhases = (D20000000000000000000005,); buildRules = (); dependencies = (D20000000000000000000007,); productName = GainsChatUITests; productReference = D20000000000000000000002; productType = "com.apple.product-type.bundle.ui-testing"; };
+        D10000000000000000000002 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = GainsChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        D20000000000000000000002 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = GainsChatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        D10000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainsChatTests/WorkoutFlowTests.swift; sourceTree = SOURCE_ROOT; };
+        D20000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainsChatUITests/WorkoutNavigationTests.swift; sourceTree = SOURCE_ROOT; };
+        D10000000000000000000004 = {isa = PBXBuildFile; fileRef = D10000000000000000000003; };
+        D20000000000000000000004 = {isa = PBXBuildFile; fileRef = D20000000000000000000003; };
+        D10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D10000000000000000000004,); runOnlyForDeploymentPostprocessing = 0; };
+        D20000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D20000000000000000000004,); runOnlyForDeploymentPostprocessing = 0; };
+        D10000000000000000000007 = {isa = PBXTargetDependency; target = A10000000000000000000042; targetProxy = D10000000000000000000008; };
+        D20000000000000000000007 = {isa = PBXTargetDependency; target = A10000000000000000000042; targetProxy = D20000000000000000000008; };
+        D10000000000000000000008 = {isa = PBXContainerItemProxy; containerPortal = A10000000000000000000043; proxyType = 1; remoteGlobalIDString = A10000000000000000000042; remoteInfo = GainsChat; };
+        D20000000000000000000008 = {isa = PBXContainerItemProxy; containerPortal = A10000000000000000000043; proxyType = 1; remoteGlobalIDString = A10000000000000000000042; remoteInfo = GainsChat; };
+        D10000000000000000000006 = {isa = XCConfigurationList; buildConfigurations = (D10000000000000000000009,D10000000000000000000010); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+        D20000000000000000000006 = {isa = XCConfigurationList; buildConfigurations = (D20000000000000000000009,D20000000000000000000010); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+        D10000000000000000000009 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {GENERATE_INFOPLIST_FILE = YES; BUNDLE_LOADER = "$(TEST_HOST)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GainsChat.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GainsChat"; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.tests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+        D20000000000000000000009 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {GENERATE_INFOPLIST_FILE = YES; TEST_TARGET_NAME = GainsChat; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.uitests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+        D10000000000000000000010 = {isa = XCBuildConfiguration; name = Release; buildSettings = {GENERATE_INFOPLIST_FILE = YES; BUNDLE_LOADER = "$(TEST_HOST)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GainsChat.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GainsChat"; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.tests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+        D20000000000000000000010 = {isa = XCBuildConfiguration; name = Release; buildSettings = {GENERATE_INFOPLIST_FILE = YES; TEST_TARGET_NAME = GainsChat; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.uitests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+
+
 /* Begin PBXBuildFile section */
 		A1000000000000000000001C /* AppCheckController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* AppCheckController.swift */; };
 		A1000000000000000000001D /* AppMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* AppMetrics.swift */; };
-		A1000000000000000000001E /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* AppTab.swift */; };
+		A1000000000000000000001E /* AppSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* AppSection.swift */; };
 		A1000000000000000000001F /* ChatClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* ChatClient.swift */; };
 		A10000000000000000000020 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* ChatMessage.swift */; };
 		A10000000000000000000021 /* ChatMessageRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* ChatMessageRow.swift */; };
@@ -19,18 +41,26 @@
 		A10000000000000000000025 /* CoreMLIntentScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000A /* CoreMLIntentScorer.swift */; };
 		A10000000000000000000026 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000B /* EmptyStateView.swift */; };
 		A10000000000000000000027 /* GainsChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000C /* GainsChatApp.swift */; };
-		A10000000000000000000028 /* HistorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000D /* HistorySection.swift */; };
-		A10000000000000000000029 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000E /* HistoryView.swift */; };
+		A10000000000000000000085 /* ChartRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000084 /* ChartRange.swift */; };
+		A10000000000000000000087 /* ChartRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000086 /* ChartRangePicker.swift */; };
+		A10000000000000000000089 /* ExerciseChartCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000088 /* ExerciseChartCard.swift */; };
+		A1000000000000000000008B /* ExerciseSetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000008A /* ExerciseSetRow.swift */; };
+		A1000000000000000000008D /* LogsExerciseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000008C /* LogsExerciseRow.swift */; };
+		A1000000000000000000008F /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000008E /* LogsView.swift */; };
+		A10000000000000000000091 /* ExerciseLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000090 /* ExerciseLogView.swift */; };
+		A10000000000000000000093 /* ExerciseRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000092 /* ExerciseRoute.swift */; };
+		A10000000000000000000095 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000094 /* SettingsView.swift */; };
+		A10000000000000000000099 /* SettingsExerciseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000098 /* SettingsExerciseRow.swift */; };
 		A1000000000000000000002A /* LegacyCloudReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000F /* LegacyCloudReader.swift */; };
 		A1000000000000000000002B /* LiftEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000010 /* LiftEditorSheet.swift */; };
-		A1000000000000000000002C /* LiftRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* LiftRow.swift */; };
 		A1000000000000000000002D /* LogConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* LogConfirmation.swift */; };
 		A1000000000000000000002E /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* PersistenceController.swift */; };
 		A1000000000000000000002F /* ProgressChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* ProgressChart.swift */; };
-		A10000000000000000000030 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* ProgressView.swift */; };
-		A10000000000000000000031 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* RootTabView.swift */; };
+		A10000000000000000000031 /* RootNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* RootNavigationView.swift */; };
 		A10000000000000000000032 /* SyncStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* SyncStatusButton.swift */; };
 		A10000000000000000000033 /* TrainingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* TrainingStore.swift */; };
+		A10000000000000000000081 /* AppPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000080 /* AppPalette.swift */; };
+		A10000000000000000000083 /* ChatTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000082 /* ChatTranscript.swift */; };
 		A10000000000000000000034 /* IntentRouter.mlmodel in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000019 /* IntentRouter.mlmodel */; };
 		A10000000000000000000037 /* GainsCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000035 /* GainsCore */; };
 		A10000000000000000000038 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000036 /* FirebaseAppCheck */; };
@@ -40,7 +70,7 @@
 /* Begin PBXFileReference section */
 		A10000000000000000000001 /* AppCheckController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCheckController.swift; sourceTree = "<group>"; };
 		A10000000000000000000002 /* AppMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetrics.swift; sourceTree = "<group>"; };
-		A10000000000000000000003 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 /* AppSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSection.swift; sourceTree = "<group>"; };
 		A10000000000000000000004 /* ChatClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatClient.swift; sourceTree = "<group>"; };
 		A10000000000000000000005 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		A10000000000000000000006 /* ChatMessageRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageRow.swift; sourceTree = "<group>"; };
@@ -50,22 +80,30 @@
 		A1000000000000000000000A /* CoreMLIntentScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreMLIntentScorer.swift; sourceTree = "<group>"; };
 		A1000000000000000000000B /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		A1000000000000000000000C /* GainsChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainsChatApp.swift; sourceTree = "<group>"; };
-		A1000000000000000000000D /* HistorySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistorySection.swift; sourceTree = "<group>"; };
-		A1000000000000000000000E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A1000000000000000000000F /* LegacyCloudReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyCloudReader.swift; sourceTree = "<group>"; };
 		A10000000000000000000010 /* LiftEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftEditorSheet.swift; sourceTree = "<group>"; };
-		A10000000000000000000011 /* LiftRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftRow.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* LogConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogConfirmation.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* ProgressChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressChart.swift; sourceTree = "<group>"; };
-		A10000000000000000000015 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
-		A10000000000000000000016 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		A10000000000000000000016 /* RootNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationView.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* SyncStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusButton.swift; sourceTree = "<group>"; };
 		A10000000000000000000018 /* TrainingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingStore.swift; sourceTree = "<group>"; };
 		A10000000000000000000019 /* IntentRouter.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = IntentRouter.mlmodel; sourceTree = "<group>"; };
 		A1000000000000000000001A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000000000000000000001B /* GainsChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GainsChat.entitlements; sourceTree = "<group>"; };
 		A10000000000000000000041 /* GainsChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GainsChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000080 /* AppPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPalette.swift; sourceTree = "<group>"; };
+		A10000000000000000000082 /* ChatTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscript.swift; sourceTree = "<group>"; };
+		A10000000000000000000084 /* ChartRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRange.swift; sourceTree = "<group>"; };
+		A10000000000000000000086 /* ChartRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRangePicker.swift; sourceTree = "<group>"; };
+		A10000000000000000000088 /* ExerciseChartCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseChartCard.swift; sourceTree = "<group>"; };
+		A1000000000000000000008A /* ExerciseSetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSetRow.swift; sourceTree = "<group>"; };
+		A1000000000000000000008C /* LogsExerciseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsExerciseRow.swift; sourceTree = "<group>"; };
+		A1000000000000000000008E /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000090 /* ExerciseLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLogView.swift; sourceTree = "<group>"; };
+		A10000000000000000000092 /* ExerciseRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseRoute.swift; sourceTree = "<group>"; };
+		A10000000000000000000094 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000098 /* SettingsExerciseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExerciseRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,10 +124,11 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000002 /* AppMetrics.swift */,
-				A10000000000000000000003 /* AppTab.swift */,
+				A10000000000000000000080 /* AppPalette.swift */,
+				A10000000000000000000003 /* AppSection.swift */,
 				A1000000000000000000000B /* EmptyStateView.swift */,
 				A1000000000000000000000C /* GainsChatApp.swift */,
-				A10000000000000000000016 /* RootTabView.swift */,
+				A10000000000000000000016 /* RootNavigationView.swift */,
 				A10000000000000000000017 /* SyncStatusButton.swift */,
 			);
 			path = App;
@@ -102,6 +141,7 @@
 				A10000000000000000000005 /* ChatMessage.swift */,
 				A10000000000000000000006 /* ChatMessageRow.swift */,
 				A10000000000000000000007 /* ChatStore.swift */,
+				A10000000000000000000082 /* ChatTranscript.swift */,
 				A10000000000000000000008 /* ChatView.swift */,
 				A10000000000000000000009 /* ComposerBar.swift */,
 				A10000000000000000000012 /* LogConfirmation.swift */,
@@ -112,10 +152,7 @@
 		A10000000000000000000062 /* History */ = {
 			isa = PBXGroup;
 			children = (
-				A1000000000000000000000D /* HistorySection.swift */,
-				A1000000000000000000000E /* HistoryView.swift */,
 				A10000000000000000000010 /* LiftEditorSheet.swift */,
-				A10000000000000000000011 /* LiftRow.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -124,9 +161,32 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000014 /* ProgressChart.swift */,
-				A10000000000000000000015 /* ProgressView.swift */,
 			);
 			path = Progress;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000096 /* Logs */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000084 /* ChartRange.swift */,
+				A10000000000000000000086 /* ChartRangePicker.swift */,
+				A10000000000000000000088 /* ExerciseChartCard.swift */,
+				A10000000000000000000090 /* ExerciseLogView.swift */,
+				A10000000000000000000092 /* ExerciseRoute.swift */,
+				A1000000000000000000008A /* ExerciseSetRow.swift */,
+				A1000000000000000000008C /* LogsExerciseRow.swift */,
+				A1000000000000000000008E /* LogsView.swift */,
+			);
+			path = Logs;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000097 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000098 /* SettingsExerciseRow.swift */,
+				A10000000000000000000094 /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000064 /* Persistence */ = {
@@ -155,8 +215,10 @@
 				A10000000000000000000061 /* Chat */,
 				A10000000000000000000062 /* History */,
 				A10000000000000000000065 /* Intelligence */,
+				A10000000000000000000096 /* Logs */,
 				A10000000000000000000064 /* Persistence */,
 				A10000000000000000000063 /* Progress */,
+				A10000000000000000000097 /* Settings */,
 				A10000000000000000000019 /* IntentRouter.mlmodel */,
 				A1000000000000000000001A /* Info.plist */,
 				A1000000000000000000001B /* GainsChat.entitlements */,
@@ -168,6 +230,8 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000041 /* GainsChat.app */,
+                D10000000000000000000002,
+                D20000000000000000000002,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -177,6 +241,8 @@
 			children = (
 				A1000000000000000000003E /* GainsChat */,
 				A10000000000000000000040 /* Products */,
+                D10000000000000000000003,
+                D20000000000000000000003,
 			);
 			sourceTree = "<group>";
 		};
@@ -190,6 +256,7 @@
 				A1000000000000000000003B /* Sources */,
 				A1000000000000000000003D /* Frameworks */,
 				A1000000000000000000003C /* Resources */,
+                A90000000000000000000001 /* Optional Firebase configuration */,
 			);
 			buildRules = (
 			);
@@ -237,10 +304,27 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+                D10000000000000000000001,
+                D20000000000000000000001,
 				A10000000000000000000042 /* GainsChat */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+        A90000000000000000000001 = {
+            isa = PBXShellScriptBuildPhase;
+            name = "Optional Firebase configuration";
+            alwaysOutOfDate = 1;
+            buildActionMask = 2147483647;
+            files = ();
+            inputPaths = ("$(SRCROOT)/GainsChat");
+            outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist");
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "set -eu\nsource_plist=\"$SRCROOT/GainsChat/GoogleService-Info.plist\"\noutput_plist=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/GoogleService-Info.plist\"\nif [ -f \"$source_plist\" ]; then\n    /usr/bin/install -m 644 \"$source_plist\" \"$output_plist\"\nelif [ -f \"$output_plist\" ]; then\n    /bin/rm \"$output_plist\"\nfi\n";
+        };
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A1000000000000000000003C /* Resources */ = {
@@ -260,7 +344,7 @@
 			files = (
 				A1000000000000000000001C /* AppCheckController.swift in Sources */,
 				A1000000000000000000001D /* AppMetrics.swift in Sources */,
-				A1000000000000000000001E /* AppTab.swift in Sources */,
+				A1000000000000000000001E /* AppSection.swift in Sources */,
 				A1000000000000000000001F /* ChatClient.swift in Sources */,
 				A10000000000000000000020 /* ChatMessage.swift in Sources */,
 				A10000000000000000000021 /* ChatMessageRow.swift in Sources */,
@@ -270,16 +354,24 @@
 				A10000000000000000000025 /* CoreMLIntentScorer.swift in Sources */,
 				A10000000000000000000026 /* EmptyStateView.swift in Sources */,
 				A10000000000000000000027 /* GainsChatApp.swift in Sources */,
-				A10000000000000000000028 /* HistorySection.swift in Sources */,
-				A10000000000000000000029 /* HistoryView.swift in Sources */,
+				A10000000000000000000081 /* AppPalette.swift in Sources */,
+				A10000000000000000000083 /* ChatTranscript.swift in Sources */,
+				A10000000000000000000085 /* ChartRange.swift in Sources */,
+				A10000000000000000000087 /* ChartRangePicker.swift in Sources */,
+				A10000000000000000000089 /* ExerciseChartCard.swift in Sources */,
+				A10000000000000000000091 /* ExerciseLogView.swift in Sources */,
+				A10000000000000000000093 /* ExerciseRoute.swift in Sources */,
+				A1000000000000000000008B /* ExerciseSetRow.swift in Sources */,
 				A1000000000000000000002A /* LegacyCloudReader.swift in Sources */,
 				A1000000000000000000002B /* LiftEditorSheet.swift in Sources */,
-				A1000000000000000000002C /* LiftRow.swift in Sources */,
+				A1000000000000000000008D /* LogsExerciseRow.swift in Sources */,
+				A1000000000000000000008F /* LogsView.swift in Sources */,
 				A1000000000000000000002D /* LogConfirmation.swift in Sources */,
 				A1000000000000000000002E /* PersistenceController.swift in Sources */,
 				A1000000000000000000002F /* ProgressChart.swift in Sources */,
-				A10000000000000000000030 /* ProgressView.swift in Sources */,
-				A10000000000000000000031 /* RootTabView.swift in Sources */,
+				A10000000000000000000095 /* SettingsView.swift in Sources */,
+				A10000000000000000000099 /* SettingsExerciseRow.swift in Sources */,
+				A10000000000000000000031 /* RootNavigationView.swift in Sources */,
 				A10000000000000000000032 /* SyncStatusButton.swift in Sources */,
 				A10000000000000000000033 /* TrainingStore.swift in Sources */,
 			);

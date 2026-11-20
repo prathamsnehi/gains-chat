@@ -20,8 +20,12 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Dictate a workout message before sending it.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Transcribe your workout message into an editable draft.</string>
 	<key>ChatEndpoint</key>
-	<string>https://gains-chat.web.app/chat</string>
+	<string>https://us-central1-gains-chat.cloudfunctions.net/chat</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>

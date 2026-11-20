@@ -3,41 +3,33 @@ import SwiftUI
 struct ChatView: View {
     @ObservedObject var chat: ChatStore
     @ObservedObject var training: TrainingStore
+    var openSidebar: () -> Void
     @State private var draft = ""
 
     var body: some View {
         NavigationStack {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading) {
-                        ForEach(chat.messages) { message in
-                            ChatMessageRow(message: message)
-                                .id(message.id)
-                        }
-                    }
-                    .padding()
+            ChatTranscript(chat: chat, training: training)
+                .background(LinearGradient(colors: [AppPalette.accent.opacity(0.08), AppPalette.canvas],
+                                           startPoint: .topTrailing, endPoint: .center))
+                .navigationTitle("Chat")
+                .toolbar { SidebarButton(action: openSidebar) }
+                .navigationBarTitleDisplayMode(.inline)
+                .safeAreaInset(edge: .bottom) {
+                    ComposerBar(text: $draft, busy: chat.activity != nil, add: chat.openForm) {
+                        let submitted = draft
+                        draft = ""
+                        chat.send(submitted)
+                    }.padding(.horizontal).padding(.bottom, 6)
                 }
-                .onChange(of: chat.messages.map(\.text).joined(separator: "\n")) { _ in
-                    if let last = chat.messages.last {
-                        proxy.scrollTo(last.id, anchor: .bottom)
-                    }
+                .alert("Use the online assistant?", isPresented: $chat.requestingConsent) {
+                    Button("Allow") { chat.consent = true; chat.startOnline() }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("Your messages, relevant workout records, and tool results will be sent through Firebase to TokenRouter and its AI provider. You can change this in Settings.")
                 }
-            }
-            .navigationTitle("Chat")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    SyncStatusButton(training: training)
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
-                ComposerBar(text: $draft, send: send)
-            }
+                .alert("Gains Chat", isPresented: Binding(get: { chat.error != nil }, set: { if !$0 { chat.error = nil } })) {
+                    Button("OK") { chat.error = nil }
+                } message: { Text(chat.error ?? "") }
         }
-    }
-
-    private func send() {
-        let text = draft
-        draft = ""
-        chat.send(text)
     }
 }

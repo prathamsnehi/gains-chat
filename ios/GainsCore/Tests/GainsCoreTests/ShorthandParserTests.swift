@@ -144,4 +144,19 @@ struct ShorthandParserTests {
         #expect(draft.reps == 6)
         #expect(draft.unit == .lb)
     }
+
+    @Test func assistanceAndBodyweightOnlyAreWeights() {
+        guard case .lift(let assisted) = ShorthandParser.parse("pullup -20 8") else {
+            Issue.record("expected an assisted lift")
+            return
+        }
+        #expect(assisted.weight == -20)
+        #expect(assisted.reps == 8)
+        guard case .lift(let bodyweight) = ShorthandParser.parse("pullup 0 8") else {
+            Issue.record("expected a bodyweight lift")
+            return
+        }
+        #expect(bodyweight.weight == 0)
+        #expect(bodyweight.reps == 8)
+    }
 }

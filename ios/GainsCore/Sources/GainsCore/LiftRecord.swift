@@ -1,6 +1,6 @@
 import Foundation
 
-public struct LiftRecord: Equatable, Identifiable, Sendable {
+public struct LiftRecord: Codable, Equatable, Identifiable, Sendable {
     public var id: String
     public var exerciseID: String
     public var exerciseName: String
@@ -8,6 +8,7 @@ public struct LiftRecord: Equatable, Identifiable, Sendable {
     public var reps: Double
     public var unit: WeightUnit
     public var performedAt: Date
+    public var bodyweightSnapshot: Double?
 
     public init(
         id: String,
@@ -16,7 +17,8 @@ public struct LiftRecord: Equatable, Identifiable, Sendable {
         weight: Double,
         reps: Double,
         unit: WeightUnit,
-        performedAt: Date
+        performedAt: Date,
+        bodyweightSnapshot: Double? = nil
     ) {
         self.id = id
         self.exerciseID = exerciseID
@@ -25,5 +27,6 @@ public struct LiftRecord: Equatable, Identifiable, Sendable {
         self.reps = reps
         self.unit = unit
         self.performedAt = performedAt
+        self.bodyweightSnapshot = bodyweightSnapshot
     }
 }

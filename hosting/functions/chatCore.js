@@ -25,20 +25,31 @@ function normalizeLift(lift) {
   const weight = Number(lift.weight);
   const reps = Number(lift.reps);
   if (!Number.isFinite(weight) || !Number.isFinite(reps)) return null;
-  return {
+  const normalized = {
     exerciseName: lift.exerciseName.trim().slice(0, 100),
     weight,
     reps,
     unit: lift.unit === "kg" ? "kg" : "lb",
     performedAt: String(lift.performedAt || "").slice(0, 40),
   };
+  const snapshot = Number(lift.bodyweightSnapshot);
+  if (Number.isFinite(snapshot) && snapshot > 0) normalized.bodyweightSnapshot = snapshot;
+  return normalized;
+}
+
+function describeLift(lift) {
+  const base = `${lift.performedAt}: ${lift.exerciseName}`;
+  if (!Number.isFinite(lift.bodyweightSnapshot)) {
+    return `${base}, ${lift.weight} ${lift.unit} × ${lift.reps}`;
+  }
+  const body = `${lift.bodyweightSnapshot} ${lift.unit} bodyweight`;
+  if (lift.weight === 0) return `${base}, ${body} × ${lift.reps}`;
+  if (lift.weight > 0) return `${base}, ${body} + ${lift.weight} ${lift.unit} × ${lift.reps}`;
+  return `${base}, ${body} − ${Math.abs(lift.weight)} ${lift.unit} × ${lift.reps}`;
 }
 
 function buildMessages(text, lifts) {
-  const lines = lifts.map(
-    (lift) =>
-      `${lift.performedAt}: ${lift.exerciseName}, ${lift.weight} ${lift.unit} × ${lift.reps}`,
-  );
+  const lines = lifts.map(describeLift);
   const system = [
     "You are Gains Chat, a concise gym companion.",
     "Answer only from the local workout records below. If there are no records, say that no matching lifts were found. If the records do not answer the question, say so. Never invent lifts. Never claim you logged a set.",

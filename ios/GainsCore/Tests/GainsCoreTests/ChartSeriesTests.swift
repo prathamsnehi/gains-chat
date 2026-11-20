@@ -16,6 +16,21 @@ struct ChartSeriesTests {
         #expect(abs(points[0].estimatedOneRepMax - OneRepMax.estimate(weight: poundsAsKilos, reps: 5)) < 0.001)
     }
 
+    @Test func bodyweightSnapshotAddsToTheLoad() {
+        let lift = LiftRecord(
+            id: "1",
+            exerciseID: "pu",
+            exerciseName: "Pull-Up",
+            weight: -20,
+            reps: 8,
+            unit: .lb,
+            performedAt: date(1),
+            bodyweightSnapshot: 180
+        )
+        let points = ChartSeries.points(for: "pu", lifts: [lift])
+        #expect(abs(points[0].estimatedOneRepMax - OneRepMax.estimate(weight: 160, reps: 8)) < 0.001)
+    }
+
     private func date(_ day: TimeInterval) -> Date {
         Date(timeIntervalSince1970: day * 86_400)
     }
