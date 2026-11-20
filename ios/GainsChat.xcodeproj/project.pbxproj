@@ -1,0 +1,523 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+        D10000000000000000000001 /* GainsChatTests */ = {isa = PBXNativeTarget; name = GainsChatTests; buildConfigurationList = D10000000000000000000006; buildPhases = (D10000000000000000000005,); buildRules = (); dependencies = (D10000000000000000000007,); productName = GainsChatTests; productReference = D10000000000000000000002; productType = "com.apple.product-type.bundle.unit-test"; };
+        D20000000000000000000001 /* GainsChatUITests */ = {isa = PBXNativeTarget; name = GainsChatUITests; buildConfigurationList = D20000000000000000000006; buildPhases = (D20000000000000000000005,); buildRules = (); dependencies = (D20000000000000000000007,); productName = GainsChatUITests; productReference = D20000000000000000000002; productType = "com.apple.product-type.bundle.ui-testing"; };
+        D10000000000000000000002 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = GainsChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        D20000000000000000000002 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = GainsChatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        D10000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainsChatTests/WorkoutFlowTests.swift; sourceTree = SOURCE_ROOT; };
+        D20000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainsChatUITests/WorkoutNavigationTests.swift; sourceTree = SOURCE_ROOT; };
+        D10000000000000000000004 = {isa = PBXBuildFile; fileRef = D10000000000000000000003; };
+        D20000000000000000000004 = {isa = PBXBuildFile; fileRef = D20000000000000000000003; };
+        D10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D10000000000000000000004,); runOnlyForDeploymentPostprocessing = 0; };
+        D20000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D20000000000000000000004,); runOnlyForDeploymentPostprocessing = 0; };
+        D10000000000000000000007 = {isa = PBXTargetDependency; target = A10000000000000000000042; targetProxy = D10000000000000000000008; };
+        D20000000000000000000007 = {isa = PBXTargetDependency; target = A10000000000000000000042; targetProxy = D20000000000000000000008; };
+        D10000000000000000000008 = {isa = PBXContainerItemProxy; containerPortal = A10000000000000000000043; proxyType = 1; remoteGlobalIDString = A10000000000000000000042; remoteInfo = GainsChat; };
+        D20000000000000000000008 = {isa = PBXContainerItemProxy; containerPortal = A10000000000000000000043; proxyType = 1; remoteGlobalIDString = A10000000000000000000042; remoteInfo = GainsChat; };
+        D10000000000000000000006 = {isa = XCConfigurationList; buildConfigurations = (D10000000000000000000009,D10000000000000000000010); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+        D20000000000000000000006 = {isa = XCConfigurationList; buildConfigurations = (D20000000000000000000009,D20000000000000000000010); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+        D10000000000000000000009 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {GENERATE_INFOPLIST_FILE = YES; BUNDLE_LOADER = "$(TEST_HOST)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GainsChat.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GainsChat"; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.tests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+        D20000000000000000000009 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {GENERATE_INFOPLIST_FILE = YES; TEST_TARGET_NAME = GainsChat; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.uitests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+        D10000000000000000000010 = {isa = XCBuildConfiguration; name = Release; buildSettings = {GENERATE_INFOPLIST_FILE = YES; BUNDLE_LOADER = "$(TEST_HOST)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GainsChat.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GainsChat"; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.tests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+        D20000000000000000000010 = {isa = XCBuildConfiguration; name = Release; buildSettings = {GENERATE_INFOPLIST_FILE = YES; TEST_TARGET_NAME = GainsChat; PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat.uitests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; SWIFT_VERSION = 6.0; DEVELOPMENT_TEAM = T296YJXC87; }; };
+
+
+/* Begin PBXBuildFile section */
+		A1000000000000000000001C /* AppCheckController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* AppCheckController.swift */; };
+		A1000000000000000000001D /* AppMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* AppMetrics.swift */; };
+		A1000000000000000000001E /* AppSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* AppSection.swift */; };
+		A1000000000000000000001F /* ChatClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* ChatClient.swift */; };
+		A10000000000000000000020 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* ChatMessage.swift */; };
+		A10000000000000000000021 /* ChatMessageRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* ChatMessageRow.swift */; };
+		A10000000000000000000022 /* ChatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* ChatStore.swift */; };
+		A10000000000000000000023 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* ChatView.swift */; };
+		A10000000000000000000024 /* ComposerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* ComposerBar.swift */; };
+		A10000000000000000000025 /* CoreMLIntentScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000A /* CoreMLIntentScorer.swift */; };
+		A10000000000000000000026 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000B /* EmptyStateView.swift */; };
+		A10000000000000000000027 /* GainsChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000C /* GainsChatApp.swift */; };
+		A10000000000000000000085 /* ChartRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000084 /* ChartRange.swift */; };
+		A10000000000000000000087 /* ChartRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000086 /* ChartRangePicker.swift */; };
+		A10000000000000000000089 /* ExerciseChartCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000088 /* ExerciseChartCard.swift */; };
+		A1000000000000000000008B /* ExerciseSetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000008A /* ExerciseSetRow.swift */; };
+		A1000000000000000000008D /* LogsExerciseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000008C /* LogsExerciseRow.swift */; };
+		A1000000000000000000008F /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000008E /* LogsView.swift */; };
+		A10000000000000000000091 /* ExerciseLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000090 /* ExerciseLogView.swift */; };
+		A10000000000000000000093 /* ExerciseRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000092 /* ExerciseRoute.swift */; };
+		A10000000000000000000095 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000094 /* SettingsView.swift */; };
+		A10000000000000000000099 /* SettingsExerciseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000098 /* SettingsExerciseRow.swift */; };
+		A1000000000000000000002A /* LegacyCloudReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000F /* LegacyCloudReader.swift */; };
+		A1000000000000000000002B /* LiftEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000010 /* LiftEditorSheet.swift */; };
+		A1000000000000000000002D /* LogConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* LogConfirmation.swift */; };
+		A1000000000000000000002E /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* PersistenceController.swift */; };
+		A1000000000000000000002F /* ProgressChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* ProgressChart.swift */; };
+		A10000000000000000000031 /* RootNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* RootNavigationView.swift */; };
+		A10000000000000000000032 /* SyncStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* SyncStatusButton.swift */; };
+		A10000000000000000000033 /* TrainingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* TrainingStore.swift */; };
+		A10000000000000000000081 /* AppPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000080 /* AppPalette.swift */; };
+		A10000000000000000000083 /* ChatTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000082 /* ChatTranscript.swift */; };
+		A10000000000000000000034 /* IntentRouter.mlmodel in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000019 /* IntentRouter.mlmodel */; };
+		A10000000000000000000037 /* GainsCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000035 /* GainsCore */; };
+		A10000000000000000000038 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000036 /* FirebaseAppCheck */; };
+		A10000000000000000000051 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000050 /* FirebaseCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000001 /* AppCheckController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCheckController.swift; sourceTree = "<group>"; };
+		A10000000000000000000002 /* AppMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetrics.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 /* AppSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSection.swift; sourceTree = "<group>"; };
+		A10000000000000000000004 /* ChatClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatClient.swift; sourceTree = "<group>"; };
+		A10000000000000000000005 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
+		A10000000000000000000006 /* ChatMessageRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageRow.swift; sourceTree = "<group>"; };
+		A10000000000000000000007 /* ChatStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStore.swift; sourceTree = "<group>"; };
+		A10000000000000000000008 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		A10000000000000000000009 /* ComposerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerBar.swift; sourceTree = "<group>"; };
+		A1000000000000000000000A /* CoreMLIntentScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreMLIntentScorer.swift; sourceTree = "<group>"; };
+		A1000000000000000000000B /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000C /* GainsChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainsChatApp.swift; sourceTree = "<group>"; };
+		A1000000000000000000000F /* LegacyCloudReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyCloudReader.swift; sourceTree = "<group>"; };
+		A10000000000000000000010 /* LiftEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftEditorSheet.swift; sourceTree = "<group>"; };
+		A10000000000000000000012 /* LogConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogConfirmation.swift; sourceTree = "<group>"; };
+		A10000000000000000000013 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		A10000000000000000000014 /* ProgressChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressChart.swift; sourceTree = "<group>"; };
+		A10000000000000000000016 /* RootNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationView.swift; sourceTree = "<group>"; };
+		A10000000000000000000017 /* SyncStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusButton.swift; sourceTree = "<group>"; };
+		A10000000000000000000018 /* TrainingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingStore.swift; sourceTree = "<group>"; };
+		A10000000000000000000019 /* IntentRouter.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = IntentRouter.mlmodel; sourceTree = "<group>"; };
+		A1000000000000000000001A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000000000000000000001B /* GainsChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GainsChat.entitlements; sourceTree = "<group>"; };
+		A10000000000000000000041 /* GainsChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GainsChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000080 /* AppPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPalette.swift; sourceTree = "<group>"; };
+		A10000000000000000000082 /* ChatTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscript.swift; sourceTree = "<group>"; };
+		A10000000000000000000084 /* ChartRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRange.swift; sourceTree = "<group>"; };
+		A10000000000000000000086 /* ChartRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRangePicker.swift; sourceTree = "<group>"; };
+		A10000000000000000000088 /* ExerciseChartCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseChartCard.swift; sourceTree = "<group>"; };
+		A1000000000000000000008A /* ExerciseSetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSetRow.swift; sourceTree = "<group>"; };
+		A1000000000000000000008C /* LogsExerciseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsExerciseRow.swift; sourceTree = "<group>"; };
+		A1000000000000000000008E /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000090 /* ExerciseLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLogView.swift; sourceTree = "<group>"; };
+		A10000000000000000000092 /* ExerciseRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseRoute.swift; sourceTree = "<group>"; };
+		A10000000000000000000094 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000098 /* SettingsExerciseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExerciseRow.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1000000000000000000003D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000037 /* GainsCore in Frameworks */,
+				A10000000000000000000038 /* FirebaseAppCheck in Frameworks */,
+				A10000000000000000000051 /* FirebaseCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000060 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000002 /* AppMetrics.swift */,
+				A10000000000000000000080 /* AppPalette.swift */,
+				A10000000000000000000003 /* AppSection.swift */,
+				A1000000000000000000000B /* EmptyStateView.swift */,
+				A1000000000000000000000C /* GainsChatApp.swift */,
+				A10000000000000000000016 /* RootNavigationView.swift */,
+				A10000000000000000000017 /* SyncStatusButton.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000061 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000004 /* ChatClient.swift */,
+				A10000000000000000000005 /* ChatMessage.swift */,
+				A10000000000000000000006 /* ChatMessageRow.swift */,
+				A10000000000000000000007 /* ChatStore.swift */,
+				A10000000000000000000082 /* ChatTranscript.swift */,
+				A10000000000000000000008 /* ChatView.swift */,
+				A10000000000000000000009 /* ComposerBar.swift */,
+				A10000000000000000000012 /* LogConfirmation.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000062 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000010 /* LiftEditorSheet.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000063 /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000014 /* ProgressChart.swift */,
+			);
+			path = Progress;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000096 /* Logs */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000084 /* ChartRange.swift */,
+				A10000000000000000000086 /* ChartRangePicker.swift */,
+				A10000000000000000000088 /* ExerciseChartCard.swift */,
+				A10000000000000000000090 /* ExerciseLogView.swift */,
+				A10000000000000000000092 /* ExerciseRoute.swift */,
+				A1000000000000000000008A /* ExerciseSetRow.swift */,
+				A1000000000000000000008C /* LogsExerciseRow.swift */,
+				A1000000000000000000008E /* LogsView.swift */,
+			);
+			path = Logs;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000097 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000098 /* SettingsExerciseRow.swift */,
+				A10000000000000000000094 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000064 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000000F /* LegacyCloudReader.swift */,
+				A10000000000000000000013 /* PersistenceController.swift */,
+				A10000000000000000000018 /* TrainingStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000065 /* Intelligence */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000001 /* AppCheckController.swift */,
+				A1000000000000000000000A /* CoreMLIntentScorer.swift */,
+			);
+			path = Intelligence;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000003E /* GainsChat */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000060 /* App */,
+				A10000000000000000000061 /* Chat */,
+				A10000000000000000000062 /* History */,
+				A10000000000000000000065 /* Intelligence */,
+				A10000000000000000000096 /* Logs */,
+				A10000000000000000000064 /* Persistence */,
+				A10000000000000000000063 /* Progress */,
+				A10000000000000000000097 /* Settings */,
+				A10000000000000000000019 /* IntentRouter.mlmodel */,
+				A1000000000000000000001A /* Info.plist */,
+				A1000000000000000000001B /* GainsChat.entitlements */,
+			);
+			path = GainsChat;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000040 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000041 /* GainsChat.app */,
+                D10000000000000000000002,
+                D20000000000000000000002,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000003F = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000003E /* GainsChat */,
+				A10000000000000000000040 /* Products */,
+                D10000000000000000000003,
+                D20000000000000000000003,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000042 /* GainsChat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000044 /* Build configuration list for PBXNativeTarget "GainsChat" */;
+			buildPhases = (
+				A1000000000000000000003B /* Sources */,
+				A1000000000000000000003D /* Frameworks */,
+				A1000000000000000000003C /* Resources */,
+                A90000000000000000000001 /* Optional Firebase configuration */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GainsChat;
+			packageProductDependencies = (
+				A10000000000000000000035 /* GainsCore */,
+				A10000000000000000000036 /* FirebaseAppCheck */,
+				A10000000000000000000050 /* FirebaseCore */,
+			);
+			productName = GainsChat;
+			productReference = A10000000000000000000041 /* GainsChat.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000043 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					A10000000000000000000042 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000045 /* Build configuration list for PBXProject "GainsChat" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1000000000000000000003F;
+			packageReferences = (
+				A1000000000000000000003A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				A10000000000000000000039 /* XCLocalSwiftPackageReference "GainsCore" */,
+			);
+			productRefGroup = A10000000000000000000040 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+                D10000000000000000000001,
+                D20000000000000000000001,
+				A10000000000000000000042 /* GainsChat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+        A90000000000000000000001 = {
+            isa = PBXShellScriptBuildPhase;
+            name = "Optional Firebase configuration";
+            alwaysOutOfDate = 1;
+            buildActionMask = 2147483647;
+            files = ();
+            inputPaths = ("$(SRCROOT)/GainsChat");
+            outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist");
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "set -eu\nsource_plist=\"$SRCROOT/GainsChat/GoogleService-Info.plist\"\noutput_plist=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/GoogleService-Info.plist\"\nif [ -f \"$source_plist\" ]; then\n    /usr/bin/install -m 644 \"$source_plist\" \"$output_plist\"\nelif [ -f \"$output_plist\" ]; then\n    /bin/rm \"$output_plist\"\nfi\n";
+        };
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1000000000000000000003C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000034 /* IntentRouter.mlmodel in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1000000000000000000003B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000001C /* AppCheckController.swift in Sources */,
+				A1000000000000000000001D /* AppMetrics.swift in Sources */,
+				A1000000000000000000001E /* AppSection.swift in Sources */,
+				A1000000000000000000001F /* ChatClient.swift in Sources */,
+				A10000000000000000000020 /* ChatMessage.swift in Sources */,
+				A10000000000000000000021 /* ChatMessageRow.swift in Sources */,
+				A10000000000000000000022 /* ChatStore.swift in Sources */,
+				A10000000000000000000023 /* ChatView.swift in Sources */,
+				A10000000000000000000024 /* ComposerBar.swift in Sources */,
+				A10000000000000000000025 /* CoreMLIntentScorer.swift in Sources */,
+				A10000000000000000000026 /* EmptyStateView.swift in Sources */,
+				A10000000000000000000027 /* GainsChatApp.swift in Sources */,
+				A10000000000000000000081 /* AppPalette.swift in Sources */,
+				A10000000000000000000083 /* ChatTranscript.swift in Sources */,
+				A10000000000000000000085 /* ChartRange.swift in Sources */,
+				A10000000000000000000087 /* ChartRangePicker.swift in Sources */,
+				A10000000000000000000089 /* ExerciseChartCard.swift in Sources */,
+				A10000000000000000000091 /* ExerciseLogView.swift in Sources */,
+				A10000000000000000000093 /* ExerciseRoute.swift in Sources */,
+				A1000000000000000000008B /* ExerciseSetRow.swift in Sources */,
+				A1000000000000000000002A /* LegacyCloudReader.swift in Sources */,
+				A1000000000000000000002B /* LiftEditorSheet.swift in Sources */,
+				A1000000000000000000008D /* LogsExerciseRow.swift in Sources */,
+				A1000000000000000000008F /* LogsView.swift in Sources */,
+				A1000000000000000000002D /* LogConfirmation.swift in Sources */,
+				A1000000000000000000002E /* PersistenceController.swift in Sources */,
+				A1000000000000000000002F /* ProgressChart.swift in Sources */,
+				A10000000000000000000095 /* SettingsView.swift in Sources */,
+				A10000000000000000000099 /* SettingsExerciseRow.swift in Sources */,
+				A10000000000000000000031 /* RootNavigationView.swift in Sources */,
+				A10000000000000000000032 /* SyncStatusButton.swift in Sources */,
+				A10000000000000000000033 /* TrainingStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000046 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A10000000000000000000047 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A10000000000000000000048 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = GainsChat/GainsChat.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T296YJXC87;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = GainsChat/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+
+			};
+			name = Debug;
+		};
+		A10000000000000000000049 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = GainsChat/GainsChat.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T296YJXC87;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = GainsChat/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blackmaskexe.gainschat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000045 /* Build configuration list for PBXProject "GainsChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000046 /* Debug */,
+				A10000000000000000000047 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000044 /* Build configuration list for PBXNativeTarget "GainsChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000048 /* Debug */,
+				A10000000000000000000049 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A10000000000000000000039 /* XCLocalSwiftPackageReference "GainsCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = GainsCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1000000000000000000003A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A10000000000000000000050 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000000000000000000003A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		A10000000000000000000036 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000000000000000000003A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		A10000000000000000000035 /* GainsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000039 /* XCLocalSwiftPackageReference "GainsCore" */;
+			productName = GainsCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A10000000000000000000043 /* Project object */;
+}

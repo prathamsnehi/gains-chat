@@ -1,0 +1,20 @@
+schemaVersion: 1
+enabledWorkflows:
+  - debugging
+  - simulator
+  - simulator-management
+  - ui-automation
+  - utilities
+  - xcode-ide
+sentryDisabled: true
+sessionDefaults:
+  projectPath: ios/GainsChat.xcodeproj
+  scheme: GainsChat
+  configuration: Debug
+  simulatorName: iPhone 18 Pro
+  simulatorId: A7853C27-C9E3-4A61-8A43-4F9C7DC6DF10
+  simulatorPlatform: iOS Simulator
+setupPreferences:
+  platforms:
+    - iOS
+debug: false

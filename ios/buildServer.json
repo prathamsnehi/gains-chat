@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "/opt/homebrew/bin/sweetpad",
+    "bsp",
+    "serve",
+    "--project",
+    "/Users/prath/code/projects/gains-chat/ios/GainsChat.xcodeproj"
+  ],
+  "bspVersion": "2.2.0",
+  "languages": [
+    "swift",
+    "objective-c",
+    "objective-cpp",
+    "c",
+    "cpp"
+  ],
+  "name": "sweetpad",
+  "version": "0.1.17"
+}

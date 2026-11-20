@@ -1,28 +1,35 @@
 {
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
   "functions": [
     {
-      "source": "functions",
+      "source": "hosting/functions",
       "codebase": "default",
+      "runtime": "nodejs24",
       "ignore": [
         "node_modules",
         ".git",
         "firebase-debug.log",
         "firebase-debug.*.log",
         "*.local",
-        ".yarn/cache",
-        ".yarn/unplugged",
-        ".yarn/install-state.gz",
-        ".yarn/build-state.yml",
-        "**/*.test.js",
-        "scripts",
-        "audit-*.jsonl",
-        "*.log"
-      ],
-      "runtime": "nodejs24"
+        "**/*.test.js"
+      ]
     }
-  ]
+  ],
+  "hosting": {
+    "public": "hosting/public",
+    "cleanUrls": true,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/chat",
+        "function": {
+          "functionId": "chat",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
 }
